@@ -259,11 +259,38 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_pyramid()
         self.widgets_soccer()
         self.widgets_superEllipse()
+        self.widgets_sphericalHarm()
+        self.widgets_ultraShape()
         self.widgets_extra()
         self.widgets_sculpting()
         self.widgets_divide()
         self.widgets_bevel()
         self.widgets_bridge()
+        self.widgets_detach()  
+        self.widgets_flip()  
+        self.widgets_merge()
+        self.widgets_mergeToCenter()
+        self.widgets_extrude()
+        self.widgets_edgeFlow()
+        self.widgets_symmetrize()
+        self.widgets_average()
+        self.widgets_chamfer()
+        self.widgets_reorder()
+        self.widgets_delEdge()
+        self.widgets_edgeFlow()
+        self.widgets_flipEdge()
+        self.widgets_transform()
+        self.widgets_circularize()
+        self.widgets_collapseEdge()
+        self.widgets_curveSplit()
+        self.widgets_duplicateFacet()
+        self.widgets_extract()
+        self.widgets_invisableFace()   
+        self.widgets_poke()
+        self.widgets_projectCurve()
+        self.widgets_wedge()
+        self.widgets_spinEdgeForward()
+        self.widgets_spinEdgeBackward()
         self.create_widgets()
         self.create_layout()
         self.create_connections()
@@ -567,7 +594,7 @@ class SampleUI(QtWidgets.QWidget):
     def widgets_divide(self):
         self.divide_button = QtWidgets.QPushButton("Divide")
         self.divide_button.setIcon(QtGui.QIcon(":polySubdFacet.png"))
-        self.divide_button.setIconSize(QtCore.QSize(25, 25))
+        self.divide_button.setIconSize(QtCore.QSize(25, 20))
         self.divide_button.clicked.connect(self.perform_divide)
         self.divide_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.divide_button.customContextMenuRequested.connect(self.popup_divide) 
@@ -588,7 +615,7 @@ class SampleUI(QtWidgets.QWidget):
     def widgets_bevel(self):
         self.bevel_button = QtWidgets.QPushButton("Bevel")
         self.bevel_button.setIcon(QtGui.QIcon(":polyBevel.png"))
-        self.bevel_button.setIconSize(QtCore.QSize(25, 25))
+        self.bevel_button.setIconSize(QtCore.QSize(25, 20))
         self.bevel_button.clicked.connect(self.perform_bevel)
         self.bevel_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.bevel_button.customContextMenuRequested.connect(self.popup_bevel) 
@@ -609,7 +636,7 @@ class SampleUI(QtWidgets.QWidget):
     def widgets_bevel(self):
         self.bevel_button = QtWidgets.QPushButton("Bevel")
         self.bevel_button.setIcon(QtGui.QIcon(":polyBevel.png"))
-        self.bevel_button.setIconSize(QtCore.QSize(25, 25))
+        self.bevel_button.setIconSize(QtCore.QSize(25, 20))
         self.bevel_button.clicked.connect(self.perform_bevel)
         self.bevel_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.bevel_button.customContextMenuRequested.connect(self.popup_bevel) 
@@ -630,11 +657,395 @@ class SampleUI(QtWidgets.QWidget):
     def widgets_bridge(self):
         self.bridge_button = QtWidgets.QPushButton("bridge")
         self.bridge_button.setIcon(QtGui.QIcon(":polyBridge.png"))
-        self.bridge_button.setIconSize(QtCore.QSize(25, 25))
+        self.bridge_button.setIconSize(QtCore.QSize(25, 20))
         self.bridge_button.clicked.connect(self.perform_bridge)
         self.bridge_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.bridge_button.customContextMenuRequested.connect(self.popup_bridge) 
         
+    def perform_detach(self):
+        mel.eval("DetachComponent;")
+
+    def widgets_detach(self):
+        self.detach_button = QtWidgets.QPushButton("Detach")
+        self.detach_button.setIcon(QtGui.QIcon(":polySplitVertex.png"))
+        self.detach_button.setIconSize(QtCore.QSize(25, 20))
+        self.detach_button.clicked.connect(self.perform_detach)
+        
+    def perform_extrude(self):
+        mel.eval("PolyExtrude;")
+        
+    def open_extrudeOptions(self):
+        mel.eval("PolyExtrudeOptions;")
+        
+    def popup_extrude(self, position):
+        extrude_popup = QtWidgets.QMenu()
+        extrude_action = QtWidgets.QAction('Settings', self)
+        extrude_action.triggered.connect(self.open_extrudeOptions)
+        extrude_popup.addAction(extrude_action)
+        extrude_popup.exec_(self.extrude_button.mapToGlobal(position))
+
+    def widgets_extrude(self):
+        self.extrude_button = QtWidgets.QPushButton("extrude")
+        self.extrude_button.setIcon(QtGui.QIcon(":polyExtrudeFacet.png"))
+        self.extrude_button.setIconSize(QtCore.QSize(25, 20))
+        self.extrude_button.clicked.connect(self.perform_extrude)
+        self.extrude_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.extrude_button.customContextMenuRequested.connect(self.popup_extrude) 
+        
+    def perform_merge(self):
+        mel.eval("PolyMerge")
+        
+    def open_mergeOptions(self):
+        mel.eval("PolyMergeOptions;")
+        
+    def popup_merge(self, position):
+        merge_popup = QtWidgets.QMenu()
+        merge_action = QtWidgets.QAction('Settings', self)
+        merge_action.triggered.connect(self.open_mergeOptions)
+        merge_popup.addAction(merge_action)
+        merge_popup.exec_(self.merge_button.mapToGlobal(position))
+
+    def widgets_merge(self):
+        self.merge_button = QtWidgets.QPushButton("Merge")
+        self.merge_button.setIcon(QtGui.QIcon(":polyMerge.png"))
+        self.merge_button.setIconSize(QtCore.QSize(25, 20))
+        self.merge_button.clicked.connect(self.perform_merge)
+        self.merge_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.merge_button.customContextMenuRequested.connect(self.popup_merge) 
+        
+    def perform_mergeToCenter(self):
+        mel.eval("MergeToCenter")
+
+    def widgets_mergeToCenter(self):
+        self.mergeToCenter_button = QtWidgets.QPushButton("Merge2Center")
+        self.mergeToCenter_button.setIcon(QtGui.QIcon(":polyMergeToCenter.png"))
+        self.mergeToCenter_button.setIconSize(QtCore.QSize(25, 20))
+        self.mergeToCenter_button.clicked.connect(self.perform_mergeToCenter)
+
+    def perform_transform(self):
+        mel.eval("MovePolygonComponent;")
+        
+    def open_transformOptions(self):
+        mel.eval("MovePolygonComponentOptions;")
+        
+    def popup_transform(self, position):
+        transform_popup = QtWidgets.QMenu()
+        transform_action = QtWidgets.QAction('Settings', self)
+        transform_action.triggered.connect(self.open_transformOptions)
+        transform_popup.addAction(transform_action)
+        transform_popup.exec_(self.transform_button.mapToGlobal(position))
+
+    def widgets_transform(self):
+        self.transform_button = QtWidgets.QPushButton("transform")
+        self.transform_button.setIcon(QtGui.QIcon(":polyMoveVertex.png"))
+        self.transform_button.setIconSize(QtCore.QSize(25, 20))
+        self.transform_button.clicked.connect(self.perform_transform)
+        self.transform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.transform_button.customContextMenuRequested.connect(self.popup_transform) 
+        
+    def perform_flip(self):
+        mel.eval("FlipMesh;")
+
+    def widgets_flip(self):
+        self.flip_button = QtWidgets.QPushButton("flip")
+        self.flip_button.setIcon(QtGui.QIcon(":polyFlip.png"))
+        self.flip_button.setIconSize(QtCore.QSize(25, 20))
+        self.flip_button.clicked.connect(self.perform_flip)
+        
+    def perform_symmetrize(self):
+        mel.eval("Symmetrize")
+
+    def widgets_symmetrize(self):
+        self.symmetrize_button = QtWidgets.QPushButton("symmetrize")
+        self.symmetrize_button.setIcon(QtGui.QIcon(":symmetrize.png"))
+        self.symmetrize_button.setIconSize(QtCore.QSize(25, 20))
+        self.symmetrize_button.clicked.connect(self.perform_symmetrize)
+        
+    def perform_average(self):
+        mel.eval("AverageVertex;")
+        
+    def open_averageOptions(self):
+        mel.eval("AverageVertexOptions;")
+        
+    def popup_average(self, position):
+        average_popup = QtWidgets.QMenu()
+        average_action = QtWidgets.QAction('Settings', self)
+        average_action.triggered.connect(self.open_averageOptions)
+        average_popup.addAction(average_action)
+        average_popup.exec_(self.average_button.mapToGlobal(position))
+
+    def widgets_average(self):
+        self.average_button = QtWidgets.QPushButton("Average")
+        self.average_button.setIcon(QtGui.QIcon(":polyAverageVertex.png"))
+        self.average_button.setIconSize(QtCore.QSize(25, 20))
+        self.average_button.clicked.connect(self.perform_average)
+        self.average_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.average_button.customContextMenuRequested.connect(self.popup_average) 
+        
+    def perform_chamfer(self):
+        mel.eval("ChamferVertex;")
+        
+    def open_chamferOptions(self):
+        mel.eval("ChamferVertexOptions;")
+        
+    def popup_chamfer(self, position):
+        chamfer_popup = QtWidgets.QMenu()
+        chamfer_action = QtWidgets.QAction('Settings', self)
+        chamfer_action.triggered.connect(self.open_chamferOptions)
+        chamfer_popup.addAction(chamfer_action)
+        chamfer_popup.exec_(self.chamfer_button.mapToGlobal(position))
+
+    def widgets_chamfer(self):
+        self.chamfer_button = QtWidgets.QPushButton("Chamfer")
+        self.chamfer_button.setIcon(QtGui.QIcon(":polyChamfer.png"))
+        self.chamfer_button.setIconSize(QtCore.QSize(25, 20))
+        self.chamfer_button.clicked.connect(self.perform_chamfer)
+        self.chamfer_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.chamfer_button.customContextMenuRequested.connect(self.popup_chamfer) 
+        
+    def perform_reorder(self):
+        mel.eval("ReorderVertex;")
+
+    def widgets_reorder(self):
+        self.reorder_button = QtWidgets.QPushButton("Reorder")
+        self.reorder_button.setIcon(QtGui.QIcon(":reorderIDs.png"))
+        self.reorder_button.setIconSize(QtCore.QSize(25, 20))
+        self.reorder_button.clicked.connect(self.perform_reorder)
+        
+    def perform_delEdge(self):
+        mel.eval("DeletePolyElements;")
+
+    def widgets_delEdge(self):
+        self.delEdge_button = QtWidgets.QPushButton("Delete Edge")
+        self.delEdge_button.setIcon(QtGui.QIcon(":polyDelEdgeVertex.png"))
+        self.delEdge_button.setIconSize(QtCore.QSize(25, 20))
+        self.delEdge_button.clicked.connect(self.perform_delEdge)
+        
+    def perform_edgeFlow(self):
+        mel.eval("PolyEditEdgeFlow;")
+        
+    def open_edgeFlowOptions(self):
+        mel.eval("PolyEditEdgeFlowOptions;")
+        
+    def popup_edgeFlow(self, position):
+        edgeFlow_popup = QtWidgets.QMenu()
+        edgeFlow_action = QtWidgets.QAction('Settings', self)
+        edgeFlow_action.triggered.connect(self.open_edgeFlowOptions)
+        edgeFlow_popup.addAction(edgeFlow_action)
+        edgeFlow_popup.exec_(self.edgeFlow_button.mapToGlobal(position))
+
+    def widgets_edgeFlow(self):
+        self.edgeFlow_button = QtWidgets.QPushButton("Edge Flow")
+        self.edgeFlow_button.setIcon(QtGui.QIcon(":polyEditEdgeFlow.png"))
+        self.edgeFlow_button.setIconSize(QtCore.QSize(25, 20))
+        self.edgeFlow_button.clicked.connect(self.perform_edgeFlow)
+        self.edgeFlow_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.edgeFlow_button.customContextMenuRequested.connect(self.popup_edgeFlow) 
+        
+    def perform_flipEdge(self):
+        mel.eval("FlipTriangleEdge;")
+        
+    def widgets_flipEdge(self):
+        self.flipEdge_button = QtWidgets.QPushButton("Flip Edge")
+        self.flipEdge_button.setIcon(QtGui.QIcon(":polyFlipEdge.png"))
+        self.flipEdge_button.setIconSize(QtCore.QSize(25, 20))
+        self.flipEdge_button.clicked.connect(self.perform_flipEdge)
+        
+    def perform_circularize(self):
+        mel.eval("PolyCircularize;")
+        
+    def open_circularizeOptions(self):
+        mel.eval("PolyCircularizeOptions;")
+        
+    def popup_circularize(self, position):
+        circularize_popup = QtWidgets.QMenu()
+        circularize_action = QtWidgets.QAction('Settings', self)
+        circularize_action.triggered.connect(self.open_circularizeOptions)
+        circularize_popup.addAction(circularize_action)
+        circularize_popup.exec_(self.circularize_button.mapToGlobal(position))
+
+    def widgets_circularize(self):
+        self.circularize_button = QtWidgets.QPushButton("Circularize")
+        self.circularize_button.setIcon(QtGui.QIcon(":polyCircularize.png"))
+        self.circularize_button.setIconSize(QtCore.QSize(25, 20))
+        self.circularize_button.clicked.connect(self.perform_circularize)
+        self.circularize_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.circularize_button.customContextMenuRequested.connect(self.popup_circularize) 
+        
+    def perform_collapseEdge(self):
+        mel.eval("performPolyCollapse 0;")
+
+    def widgets_collapseEdge(self):
+        self.collapseEdge_button = QtWidgets.QPushButton("Collapse")
+        self.collapseEdge_button.setIcon(QtGui.QIcon(":polyCollapseEdge.png"))
+        self.collapseEdge_button.setIconSize(QtCore.QSize(25, 20))
+        self.collapseEdge_button.clicked.connect(self.perform_collapseEdge)
+
+    def perform_spinEdgeBackward(self):
+        mel.eval("PolySpinEdgeBackward;")
+
+    def widgets_spinEdgeBackward(self):
+        self.spinEdgeBackward_button = QtWidgets.QPushButton("Collapse")
+        self.spinEdgeBackward_button.setIcon(QtGui.QIcon(":polySpinEdgeBackward.png"))
+        self.spinEdgeBackward_button.setIconSize(QtCore.QSize(25, 20))
+        self.spinEdgeBackward_button.clicked.connect(self.perform_spinEdgeBackward)
+        
+    def perform_spinEdgeForward(self):
+        mel.eval("PolySpinEdgeForward;")
+
+    def widgets_spinEdgeForward(self):
+        self.spinEdgeForward_button = QtWidgets.QPushButton("Collapse")
+        self.spinEdgeForward_button.setIcon(QtGui.QIcon(":polySpinEdgeForward.png"))
+        self.spinEdgeForward_button.setIconSize(QtCore.QSize(25, 20))
+        self.spinEdgeForward_button.clicked.connect(self.perform_spinEdgeForward)
+        
+    def perform_invisableFace(self):
+        mel.eval("PolyAssignSubdivHole;")
+        
+    def open_invisableFaceOptions(self):
+        mel.eval("PolyAssignSubdivHoleOptions;")
+        
+    def popup_invisableFace(self, position):
+        invisableFace_popup = QtWidgets.QMenu()
+        invisableFace_action = QtWidgets.QAction('Settings', self)
+        invisableFace_action.triggered.connect(self.open_invisableFaceOptions)
+        invisableFace_popup.addAction(invisableFace_action)
+        invisableFace_popup.exec_(self.invisableFace_button.mapToGlobal(position))
+
+    def widgets_invisableFace(self):
+        self.invisableFace_button = QtWidgets.QPushButton("Invisable Face")
+        self.invisableFace_button.setIcon(QtGui.QIcon(":polyAssignSubdivHole.png"))
+        self.invisableFace_button.setIconSize(QtCore.QSize(25, 20))
+        self.invisableFace_button.clicked.connect(self.perform_invisableFace)
+        self.invisableFace_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.invisableFace_button.customContextMenuRequested.connect(self.popup_invisableFace) 
+
+    def perform_duplicateFacet(self):
+        mel.eval("performPolyChipOff 0 1;")
+        
+    def open_duplicateFacetOptions(self):
+        mel.eval("DuplicateFaceOptions;")
+        
+    def popup_duplicateFacet(self, position):
+        duplicateFacet_popup = QtWidgets.QMenu()
+        duplicateFacet_action = QtWidgets.QAction('Settings', self)
+        duplicateFacet_action.triggered.connect(self.open_duplicateFacetOptions)
+        duplicateFacet_popup.addAction(duplicateFacet_action)
+        duplicateFacet_popup.exec_(self.duplicateFacet_button.mapToGlobal(position))
+
+    def widgets_duplicateFacet(self):
+        self.duplicateFacet_button = QtWidgets.QPushButton("Duplicate")
+        self.duplicateFacet_button.setIcon(QtGui.QIcon(":polyDuplicateFacet.png"))
+        self.duplicateFacet_button.setIconSize(QtCore.QSize(25, 20))
+        self.duplicateFacet_button.clicked.connect(self.perform_duplicateFacet)
+        self.duplicateFacet_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.duplicateFacet_button.customContextMenuRequested.connect(self.popup_duplicateFacet) 
+        
+    def perform_extract(self):
+        mel.eval("performPolyChipOff 0 0")
+        
+    def open_extractOptions(self):
+        mel.eval("ExtractFaceOptions;")
+        
+    def popup_extract(self, position):
+        extract_popup = QtWidgets.QMenu()
+        extract_action = QtWidgets.QAction('Settings', self)
+        extract_action.triggered.connect(self.open_extractOptions)
+        extract_popup.addAction(extract_action)
+        extract_popup.exec_(self.extract_button.mapToGlobal(position))
+
+    def widgets_extract(self):
+        self.extract_button = QtWidgets.QPushButton("extract")
+        self.extract_button.setIcon(QtGui.QIcon(":polyChipOff.png"))
+        self.extract_button.setIconSize(QtCore.QSize(25, 20))
+        self.extract_button.clicked.connect(self.perform_extract)
+        self.extract_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.extract_button.customContextMenuRequested.connect(self.popup_extract) 
+        
+    def perform_poke(self):
+        mel.eval("PokePolygon")
+        
+    def open_pokeOptions(self):
+        mel.eval("PokePolygonOptions;")
+        
+    def popup_poke(self, position):
+        poke_popup = QtWidgets.QMenu()
+        poke_action = QtWidgets.QAction('Settings', self)
+        poke_action.triggered.connect(self.open_pokeOptions)
+        poke_popup.addAction(poke_action)
+        poke_popup.exec_(self.poke_button.mapToGlobal(position))
+
+    def widgets_poke(self):
+        self.poke_button = QtWidgets.QPushButton("poke")
+        self.poke_button.setIcon(QtGui.QIcon(":polypokeFacet.png"))
+        self.poke_button.setIconSize(QtCore.QSize(25, 20))
+        self.poke_button.clicked.connect(self.perform_poke)
+        self.poke_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.poke_button.customContextMenuRequested.connect(self.popup_poke) 
+        
+    def perform_wedge(self):
+        mel.eval("WedgePolygon;")
+        
+    def open_wedgeOptions(self):
+        mel.eval("WedgePolygonOptions;")
+        
+    def popup_wedge(self, position):
+        wedge_popup = QtWidgets.QMenu()
+        wedge_action = QtWidgets.QAction('Settings', self)
+        wedge_action.triggered.connect(self.open_wedgeOptions)
+        wedge_popup.addAction(wedge_action)
+        wedge_popup.exec_(self.wedge_button.mapToGlobal(position))
+
+    def widgets_wedge(self):
+        self.wedge_button = QtWidgets.QPushButton("Wedge")
+        self.wedge_button.setIcon(QtGui.QIcon(":polyWedgeFace.png"))
+        self.wedge_button.setIconSize(QtCore.QSize(25, 20))
+        self.wedge_button.clicked.connect(self.perform_wedge)
+        self.wedge_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.wedge_button.customContextMenuRequested.connect(self.popup_wedge) 
+        
+    def perform_projectCurve(self):
+        mel.eval("ProjectCurveOnMesh;")
+        
+    def open_projectCurveOptions(self):
+        mel.eval("ProjectCurveOnMeshOptions;")
+        
+    def popup_projectCurve(self, position):
+        projectCurve_popup = QtWidgets.QMenu()
+        projectCurve_action = QtWidgets.QAction('Settings', self)
+        projectCurve_action.triggered.connect(self.open_projectCurveOptions)
+        projectCurve_popup.addAction(projectCurve_action)
+        projectCurve_popup.exec_(self.projectCurve_button.mapToGlobal(position))
+
+    def widgets_projectCurve(self):
+        self.projectCurve_button = QtWidgets.QPushButton("Project Curve")
+        self.projectCurve_button.setIcon(QtGui.QIcon(":projectCurve_Poly.png"))
+        self.projectCurve_button.setIconSize(QtCore.QSize(25, 20))
+        self.projectCurve_button.clicked.connect(self.perform_projectCurve)
+        self.projectCurve_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.projectCurve_button.customContextMenuRequested.connect(self.popup_projectCurve) 
+        
+    def perform_curveSplit(self):
+        mel.eval("SplitMeshWithProjectedCurve")
+        
+    def open_curveSplitOptions(self):
+        mel.eval("SplitMeshWithProjectedCurveOptions;")
+        
+    def popup_curveSplit(self, position):
+        curveSplit_popup = QtWidgets.QMenu()
+        curveSplit_action = QtWidgets.QAction('Settings', self)
+        curveSplit_action.triggered.connect(self.open_curveSplitOptions)
+        curveSplit_popup.addAction(curveSplit_action)
+        curveSplit_popup.exec_(self.curveSplit_button.mapToGlobal(position))
+
+    def widgets_curveSplit(self):
+        self.curveSplit_button = QtWidgets.QPushButton("curveSplit")
+        self.curveSplit_button.setIcon(QtGui.QIcon(":projectCurveSplit_Poly.png"))
+        self.curveSplit_button.setIconSize(QtCore.QSize(25, 20))
+        self.curveSplit_button.clicked.connect(self.perform_curveSplit)
+        self.curveSplit_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.curveSplit_button.customContextMenuRequested.connect(self.popup_curveSplit) 
+            
     def create_widgets(self):
         
         #Mesh Tool Buttons
@@ -804,10 +1215,7 @@ class SampleUI(QtWidgets.QWidget):
         self.editMesh_menuSec.set_expanded(False)
         self.editMesh_menuSec.set_Margins(4,0,0,0)
         self.editMesh_menuSec.set_header_background_color(QtGui.QColor(125,125, 125, 0))                
-        
-        self.bridge_button= QtWidgets.QPushButton("Bridge")
-        self.bridge_button.setIcon(QtGui.QIcon(":polyBridge.png"))
-        self.bridge_button.setIconSize(QtCore.QSize(25, 25))     
+       
         
         self.circularize_button= QtWidgets.QPushButton("circular")
         self.circularize_button.setIcon(QtGui.QIcon(":polyCircularize.png"))
@@ -825,10 +1233,7 @@ class SampleUI(QtWidgets.QWidget):
         self.detach_button.setIcon(QtGui.QIcon(":polySplitVertex.png"))
         self.detach_button.setIconSize(QtCore.QSize(25, 25)) 
         
-        self.extrude_button= QtWidgets.QPushButton("extrude")
-        self.extrude_button.setIcon(QtGui.QIcon(":polyExtrudeFacet.png"))
-        self.extrude_button.setIconSize(QtCore.QSize(25, 25)) 
-        
+
         self.merge_button= QtWidgets.QPushButton("merge")
         self.merge_button.setIcon(QtGui.QIcon(":polyMerge.png"))
         self.merge_button.setIconSize(QtCore.QSize(25, 25)) 
@@ -994,6 +1399,8 @@ class SampleUI(QtWidgets.QWidget):
         prim_layout3.addWidget(self.gear_button)
         prim_layout3.addWidget(self.soccer_button)
         prim_layout3.addWidget(self.superEllipse_button)
+        prim_layout3.addWidget(self.sphericalHarm_button)
+        prim_layout3.addWidget(self.ultraShape_button)
         
         sculpt_layout1 = QtWidgets.QHBoxLayout()
         sculpt_layout1.addWidget(self.lift_button)
