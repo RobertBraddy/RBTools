@@ -512,6 +512,16 @@ class SampleUI(QtWidgets.QWidget):
         self.superEllipse_button = QtWidgets.QPushButton("")
         self.superEllipse_button.setIcon(QtGui.QIcon(":polySuperEllipse.png"))
         self.superEllipse_button.setIconSize(QtCore.QSize(25, 25))
+        
+    def widgets_sphericalHarm(self):
+        self.sphericalHarm_button = QtWidgets.QPushButton("")
+        self.sphericalHarm_button.setIcon(QtGui.QIcon(":polySphericalHarmonics.png"))
+        self.sphericalHarm_button.setIconSize(QtCore.QSize(25, 25))
+        
+    def widgets_ultraShape(self):
+        self.ultraShape_button = QtWidgets.QPushButton("")
+        self.ultraShape_button.setIcon(QtGui.QIcon(":polyUltraShape.png"))
+        self.ultraShape_button.setIconSize(QtCore.QSize(25, 25))
     
     def widgets_primatives(self):    
         self.polygon_primatives = CollapsibleWidget("Polygon Primatives")
@@ -971,18 +981,15 @@ class SampleUI(QtWidgets.QWidget):
         prim_layout1.addWidget(self.torus_button)
         prim_layout1.addWidget(self.cone_button)
         
-        
-        #prim_layout1.addWidget(self.cone_button)
-        #prim_layout1.addWidget(self.torus_button)
-        
         prim_layout2 = QtWidgets.QHBoxLayout()
         prim_layout2.addWidget(self.disc_button)
         prim_layout2.addWidget(self.platonic_button)
         prim_layout2.addWidget(self.pyramid_button)
         prim_layout2.addWidget(self.prism_button)
+        prim_layout2.addWidget(self.pipe_button)
         
         prim_layout3 = QtWidgets.QHBoxLayout()
-        prim_layout3.addWidget(self.pipe_button)
+        #prim_layout3.addWidget(self.pipe_button)
         prim_layout3.addWidget(self.helix_button)
         prim_layout3.addWidget(self.gear_button)
         prim_layout3.addWidget(self.soccer_button)
