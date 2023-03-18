@@ -114,7 +114,6 @@ class ScrollableWidget(QtWidgets.QWidget):
 
 
 class CollapsibleHeader(QtWidgets.QWidget):
-    
     COLLAPSED_PIXMAP = QtGui.QPixmap(":teRightArrow.png")
     EXPANDED_PIXMAP = QtGui.QPixmap(":teDownArrow.png")
     
@@ -133,7 +132,7 @@ class CollapsibleHeader(QtWidgets.QWidget):
         self.text_label.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
         
         self.main_layout = QtWidgets.QHBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 6, 2, 6)
+        self.main_layout.setContentsMargins(4, 3, 2, 3)
         self.main_layout.setSpacing(5)
         self.main_layout.addWidget(self.icon_label)
         self.main_layout.addWidget(self.text_label)
@@ -317,7 +316,6 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_intersection()
         self.widgets_difference()
         self.widgets_union()
-        self.create_widgets()
         self.create_layout()
         self.create_connections()
         self.create_workspace_control()
@@ -330,11 +328,11 @@ class SampleUI(QtWidgets.QWidget):
         
         self.deleteHistory_button = QtWidgets.QPushButton("History")
         self.deleteHistory_button.setIcon(QtGui.QIcon(":deleteClip.png"))
-        self.deleteHistory_button.setIconSize(QtCore.QSize(25, 25))
+        self.deleteHistory_button.setIconSize(QtCore.QSize(25, 15))
         
         self.deleteNonDefHistory_button = QtWidgets.QPushButton("ND History")
         self.deleteNonDefHistory_button.setIcon(QtGui.QIcon(":deleteClip.png"))
-        self.deleteNonDefHistory_button.setIconSize(QtCore.QSize(25, 25))
+        self.deleteNonDefHistory_button.setIconSize(QtCore.QSize(25, 15))
         
         self.history_tools = CollapsibleWidget("Delete History")
         self.history_tools.set_expanded(True)
@@ -1652,23 +1650,7 @@ class SampleUI(QtWidgets.QWidget):
         self.mirror_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.mirror_button.customContextMenuRequested.connect(self.popup_mirror) 
 
-            
-    def create_widgets(self):
-        
-        #Mesh Tool Buttons
-        self.mesh_menu = CollapsibleWidget("Mesh")
-        self.mesh_menu.set_expanded(True)
-        
-        
     def widgets_sculpting(self):    
-        self.sculpting_menu = CollapsibleWidget("Sculpting")
-        self.sculpting_menu.set_expanded(True)
-        
-        self.secSculpting_menu = CollapsibleWidget("")
-        self.secSculpting_menu.set_expanded(False)
-        self.secSculpting_menu.set_Margins(4,0,0,0)
-        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0))
-
         self.lift_button = QtWidgets.QPushButton("")
         self.lift_button.setIcon(QtGui.QIcon(":Sculpt.png"))
         self.lift_button.setIconSize(QtCore.QSize(25, 25))
@@ -1677,7 +1659,6 @@ class SampleUI(QtWidgets.QWidget):
         self.sculptSmooth_button.setIcon(QtGui.QIcon(":Smooth.png"))
         self.sculptSmooth_button.setIconSize(QtCore.QSize(25, 25))
         
-           
         self.sculptRelax_button = QtWidgets.QPushButton("")
         self.sculptRelax_button.setIcon(QtGui.QIcon(":Relax.png"))
         self.sculptRelax_button.setIconSize(QtCore.QSize(25, 25))
@@ -1749,8 +1730,22 @@ class SampleUI(QtWidgets.QWidget):
         self.sculptObjects_button = QtWidgets.QPushButton("")
         self.sculptObjects_button.setIcon(QtGui.QIcon(":Objects.png"))
         self.sculptObjects_button.setIconSize(QtCore.QSize(25, 25)) 
+
+        
+
+
     
-    def widgets_extra(self):    
+    def widgets_extra(self): 
+        self.mesh_menu = CollapsibleWidget("Mesh")
+        self.mesh_menu.set_expanded(True)
+        
+        self.sculpting_menu = CollapsibleWidget("Sculpting")
+        self.sculpting_menu.set_expanded(True)
+        
+        self.secSculpting_menu = CollapsibleWidget("")
+        self.secSculpting_menu.set_expanded(False)
+        self.secSculpting_menu.set_Margins(4,0,0,0)
+        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0))
         # Edit Mesh Tools          
         self.editMesh_menu = CollapsibleWidget("Edit Mesh Tools  ")
         self.editMesh_menu.set_expanded(True)  
@@ -1760,103 +1755,9 @@ class SampleUI(QtWidgets.QWidget):
         self.editMesh_menuSec.set_Margins(4,0,0,0)
         self.editMesh_menuSec.set_header_background_color(QtGui.QColor(125,125, 125, 0))                
 
-        self.merge_button= QtWidgets.QPushButton("merge")
-        self.merge_button.setIcon(QtGui.QIcon(":polyMerge.png"))
-        self.merge_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.mergeToCenter_button= QtWidgets.QPushButton("meger center")
-        self.mergeToCenter_button.setIcon(QtGui.QIcon(":MergeToCenter"))
-        self.mergeToCenter_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.transform_button= QtWidgets.QPushButton("move vertex")
-        self.transform_button.setIcon(QtGui.QIcon(":polyMoveVertex.png"))
-        self.transform_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.flip_button= QtWidgets.QPushButton("flip")
-        self.flip_button.setIcon(QtGui.QIcon(":polyFlip.png"))
-        self.flip_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.symmetrize_button= QtWidgets.QPushButton("symmetrize")
-        self.symmetrize_button.setIcon(QtGui.QIcon(":symmetrize.png"))
-        self.symmetrize_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.chamfer_button= QtWidgets.QPushButton("chamfer")
-        self.chamfer_button.setIcon(QtGui.QIcon(":polyChamfer.png"))
-        self.chamfer_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.flipEdge_button= QtWidgets.QPushButton("Flip Edge")
-        self.flipEdge_button.setIcon(QtGui.QIcon(":polyFlipEdge.png"))
-        self.flipEdge_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.extract_button= QtWidgets.QPushButton("Extract")
-        self.extract_button.setIcon(QtGui.QIcon(":polyChipOff.png"))
-        self.extract_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.poke_button= QtWidgets.QPushButton("Poke")
-        self.poke_button.setIcon(QtGui.QIcon(":polyPoke.png"))
-        self.poke_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.wedge_button= QtWidgets.QPushButton("Wedge")
-        self.wedge_button.setIcon(QtGui.QIcon(":polyWedgeFace.png"))
-        self.wedge_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.projectCurve_button= QtWidgets.QPushButton("Project Curve")
-        self.projectCurve_button.setIcon(QtGui.QIcon(":projectCurve_Poly.png"))
-        self.projectCurve_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.splitMeshCurve_button= QtWidgets.QPushButton("Cuve Spit")
-        self.splitMeshCurve_button.setIcon(QtGui.QIcon(":projectCurveSplit_Poly.png"))
-        self.splitMeshCurve_button.setIconSize(QtCore.QSize(25, 25)) 
-
         #Mesh Tools
         self.meshTools_menu = CollapsibleWidget("Mesh Tools")
         self.meshTools_menu.set_expanded(True)
-        
-        self.connect_button= QtWidgets.QPushButton("connect")
-        self.connect_button.setIcon(QtGui.QIcon(":connect_NEX32.png"))
-        self.connect_button.setIconSize(QtCore.QSize(25, 25)) 
-    
-        
-        self.createPoly_button= QtWidgets.QPushButton("Create Poly")
-        self.createPoly_button.setIcon(QtGui.QIcon(":polyCreateFacet.png"))
-        self.createPoly_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.insertEdge_button= QtWidgets.QPushButton("Insert Edge")
-        self.insertEdge_button.setIcon(QtGui.QIcon(":polySplitEdgeRing.png"))
-        self.insertEdge_button.setIconSize(QtCore.QSize(25, 25)) 
-            
-        self.makeHole_button= QtWidgets.QPushButton("Make Hole")
-        self.makeHole_button.setIcon(QtGui.QIcon(":polyMergeFacet.png"))
-        self.makeHole_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.multiCut_button= QtWidgets.QPushButton("Multi-Cut")
-        self.multiCut_button.setIcon(QtGui.QIcon(":multiCut_NEX32.png"))
-        self.multiCut_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.offsetEdge_button= QtWidgets.QPushButton("Offset Edge")
-        self.offsetEdge_button.setIcon(QtGui.QIcon(":polyDuplicateEdgeLoop.png"))
-        self.offsetEdge_button.setIconSize(QtCore.QSize(25, 25)) 
-    
-        self.paintReduceWeights_button= QtWidgets.QPushButton("Paint Reduce")
-        self.paintReduceWeights_button.setIcon(QtGui.QIcon(":polyPaintReduceWeights.png"))
-        self.paintReduceWeights_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.paintTransferWeights_button= QtWidgets.QPushButton("Offset Edge")
-        self.paintTransferWeights_button.setIcon(QtGui.QIcon(":polyTransferAttributesWeights.png"))
-        self.paintTransferWeights_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.quadDraw_button= QtWidgets.QPushButton("Quad Draw")
-        self.quadDraw_button.setIcon(QtGui.QIcon(":quadDraw_NEX32.png"))
-        self.quadDraw_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.slideEdge_button= QtWidgets.QPushButton("Slide Edge")
-        self.slideEdge_button.setIcon(QtGui.QIcon(":slideEdgeTool.png"))
-        self.slideEdge_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.targetWeld_button= QtWidgets.QPushButton("Target Weld")
-        self.targetWeld_button.setIcon(QtGui.QIcon(":weld_NEX32.png"))
-        self.targetWeld_button.setIconSize(QtCore.QSize(25, 25)) 
-
 
     def create_layout(self):
         
@@ -1951,8 +1852,8 @@ class SampleUI(QtWidgets.QWidget):
         mesh_layout5.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout6 = QtWidgets.QHBoxLayout()
-        mesh_layout6.addWidget(self.mirror_button)
-        mesh_layout5.setAlignment(QtCore.Qt.AlignTop)
+        #mesh_layout6.addWidget(self.mirror_button)
+
         
         editMesh_layout1 = QtWidgets.QHBoxLayout()
         #editMesh_layout1.addWidget(self.divide_button)
@@ -1986,6 +1887,7 @@ class SampleUI(QtWidgets.QWidget):
         editMesh_layout5 = QtWidgets.QHBoxLayout()
         editMesh_layout5.addWidget(self.flip_button)
         editMesh_layout5.addWidget(self.symmetrize_button)
+        editMesh_layout5.addWidget(self.mirror_button)
         editMesh_layout5.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout6 = QtWidgets.QHBoxLayout()
@@ -2229,7 +2131,7 @@ class SampleUI(QtWidgets.QWidget):
         cmds.SetMeshFlattenTool()
         
     def set_meshObjectTool(self):
-        cmds.OpenVisorForMeshes()
+        cmds.OpenContentBrowser()
         
     def showEvent(self, e):
         if self.workspace_control_instance.is_floating():
