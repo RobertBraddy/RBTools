@@ -303,6 +303,20 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_quadDraw()
         self.widgets_slideEdge()
         self.widgets_targetWeld()
+        self.widgets_mirror()
+        self.widgets_quadrangulate()
+        self.widgets_triangulate()
+        self.widgets_smooth()
+        self.widgets_retopo()
+        self.widgets_remesh()
+        self.widgets_reduce()
+        self.widgets_fillHole()
+        self.widgets_conform()
+        self.widgets_separate()
+        self.widgets_combine()
+        self.widgets_intersection()
+        self.widgets_difference()
+        self.widgets_union()
         self.create_widgets()
         self.create_layout()
         self.create_connections()
@@ -588,6 +602,8 @@ class SampleUI(QtWidgets.QWidget):
         self.soccer_button.clicked.connect(self.create_soccerBall)
         self.superEllipse_button.clicked.connect(self.create_superEllipse)
         '''
+
+
         
     def perform_divide(self):
         print "running"
@@ -1172,7 +1188,7 @@ class SampleUI(QtWidgets.QWidget):
     def popup_makeHole(self, position):
         makeHole_popup = QtWidgets.QMenu()
         makeHole_action = QtWidgets.QAction('Settings', self)
-        makeHole_action.triggered.connect(self.open_makeHole_Options)
+        makeHole_action.triggered.connect(self.open_makeHoleOptions)
         makeHole_popup.addAction(makeHole_action)
         makeHole_popup.exec_(self.makeHole_button.mapToGlobal(position))
 
@@ -1330,6 +1346,312 @@ class SampleUI(QtWidgets.QWidget):
         self.targetWeld_button.clicked.connect(self.perform_targetWeld)
         self.targetWeld_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.targetWeld_button.customContextMenuRequested.connect(self.popup_targetWeld) 
+        
+    def perform_union(self):
+        mel.eval("PolygonBooleanUnion;")
+        
+    def open_unionOptions(self):
+        mel.eval("PolygonBooleanUnionOptions;")
+        
+    def popup_union(self, position):
+        union_popup = QtWidgets.QMenu()
+        union_action = QtWidgets.QAction('Settings', self)
+        union_action.triggered.connect(self.open_unionOptions)
+        union_popup.addAction(union_action)
+        union_popup.exec_(self.union_button.mapToGlobal(position))
+
+    def widgets_union(self):
+        self.union_button = QtWidgets.QPushButton("Union")
+        self.union_button.setIcon(QtGui.QIcon(":polyBooleansUnion.png"))
+        self.union_button.setIconSize(QtCore.QSize(25, 20))
+        self.union_button.clicked.connect(self.perform_union)
+        self.union_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.union_button.customContextMenuRequested.connect(self.popup_union) 
+        
+    def perform_difference(self):
+        mel.eval("PolygonBooleanDifference;")
+        
+    def open_differenceOptions(self):
+        mel.eval("PolygonBooleanDifferenceOptions;")
+        
+    def popup_difference(self, position):
+        difference_popup = QtWidgets.QMenu()
+        difference_action = QtWidgets.QAction('Settings', self)
+        difference_action.triggered.connect(self.open_differenceOptions)
+        difference_popup.addAction(difference_action)
+        difference_popup.exec_(self.difference_button.mapToGlobal(position))
+
+    def widgets_difference(self):
+        self.difference_button = QtWidgets.QPushButton("difference")
+        self.difference_button.setIcon(QtGui.QIcon(":polyBooleansDifference.png"))
+        self.difference_button.setIconSize(QtCore.QSize(25, 20))
+        self.difference_button.clicked.connect(self.perform_difference)
+        self.difference_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.difference_button.customContextMenuRequested.connect(self.popup_difference)
+        
+    def perform_difference(self):
+        mel.eval("PolygonBooleanIntersection;")
+        
+    def open_differenceOptions(self):
+        mel.eval("PolygonBooleanIntersectionOptions;")
+        
+    def popup_difference(self, position):
+        difference_popup = QtWidgets.QMenu()
+        difference_action = QtWidgets.QAction('Settings', self)
+        difference_action.triggered.connect(self.open_differenceOptions)
+        difference_popup.addAction(difference_action)
+        difference_popup.exec_(self.difference_button.mapToGlobal(position))
+
+    def widgets_difference(self):
+        self.difference_button = QtWidgets.QPushButton("difference")
+        self.difference_button.setIcon(QtGui.QIcon(":polyBooleansIntersection.png"))
+        self.difference_button.setIconSize(QtCore.QSize(25, 20))
+        self.difference_button.clicked.connect(self.perform_difference)
+        self.difference_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.difference_button.customContextMenuRequested.connect(self.popup_difference) 
+        
+    def perform_intersection(self):
+        mel.eval("PolygonBooleanIntersection;")
+        
+    def open_intersectionOptions(self):
+        mel.eval("PolygonBooleanIntersectionOptions;")
+        
+    def popup_intersection(self, position):
+        intersection_popup = QtWidgets.QMenu()
+        intersection_action = QtWidgets.QAction('Settings', self)
+        intersection_action.triggered.connect(self.open_intersectionOptions)
+        intersection_popup.addAction(intersection_action)
+        intersection_popup.exec_(self.intersection_button.mapToGlobal(position))
+
+    def widgets_intersection(self):
+        self.intersection_button = QtWidgets.QPushButton("intersection")
+        self.intersection_button.setIcon(QtGui.QIcon(":polyBooleansIntersection.png"))
+        self.intersection_button.setIconSize(QtCore.QSize(25, 20))
+        self.intersection_button.clicked.connect(self.perform_intersection)
+        self.intersection_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.intersection_button.customContextMenuRequested.connect(self.popup_intersection) 
+        
+    def perform_combine(self):
+        mel.eval("polyPerformAction polyUnite o 0;")
+        
+    def open_combineOptions(self):
+        mel.eval("PolyUniteOptions;")
+        
+    def popup_combine(self, position):
+        combine_popup = QtWidgets.QMenu()
+        combine_action = QtWidgets.QAction('Settings', self)
+        combine_action.triggered.connect(self.open_combineOptions)
+        combine_popup.addAction(combine_action)
+        combine_popup.exec_(self.combine_button.mapToGlobal(position))
+
+    def widgets_combine(self):
+        self.combine_button = QtWidgets.QPushButton("combine")
+        self.combine_button.setIcon(QtGui.QIcon(":polycombineFacet.png"))
+        self.combine_button.setIconSize(QtCore.QSize(25, 20))
+        self.combine_button.clicked.connect(self.perform_combine)
+        self.combine_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.combine_button.customContextMenuRequested.connect(self.popup_combine) 
+        
+    def perform_separate(self):
+        mel.eval("SeparatePolygon;")
+        
+    def open_separateOptions(self):
+        mel.eval("SeparatePolygonOptions;")
+        
+    def popup_separate(self, position):
+        separate_popup = QtWidgets.QMenu()
+        separate_action = QtWidgets.QAction('Settings', self)
+        separate_action.triggered.connect(self.open_separateOptions)
+        separate_popup.addAction(separate_action)
+        separate_popup.exec_(self.separate_button.mapToGlobal(position))
+
+    def widgets_separate(self):
+        self.separate_button = QtWidgets.QPushButton("separate")
+        self.separate_button.setIcon(QtGui.QIcon(":polySeparate.png"))
+        self.separate_button.setIconSize(QtCore.QSize(25, 20))
+        self.separate_button.clicked.connect(self.perform_separate)
+        self.separate_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.separate_button.customContextMenuRequested.connect(self.popup_separate) 
+        
+    def perform_conform(self):
+        mel.eval("ConformPolygon;")
+        
+    def open_conformOptions(self):
+        mel.eval("ConformPolygonOptions;")
+        
+    def popup_conform(self, position):
+        conform_popup = QtWidgets.QMenu()
+        conform_action = QtWidgets.QAction('Settings', self)
+        conform_action.triggered.connect(self.open_conformOptions)
+        conform_popup.addAction(conform_action)
+        conform_popup.exec_(self.conform_button.mapToGlobal(position))
+
+    def widgets_conform(self):
+        self.conform_button = QtWidgets.QPushButton("conform")
+        self.conform_button.setIcon(QtGui.QIcon(":polyconformFacet.png"))
+        self.conform_button.setIconSize(QtCore.QSize(25, 20))
+        self.conform_button.clicked.connect(self.perform_conform)
+        self.conform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.conform_button.customContextMenuRequested.connect(self.popup_conform) 
+        
+    def perform_fillHole(self):
+        mel.eval("FillHole")
+        
+    def open_fillHoleOptions(self):
+        mel.eval("FillHoleOptions;")
+        
+    def popup_fillHole(self, position):
+        fillHole_popup = QtWidgets.QMenu()
+        fillHole_action = QtWidgets.QAction('Settings', self)
+        fillHole_action.triggered.connect(self.open_fillHoleOptions)
+        fillHole_popup.addAction(fillHole_action)
+        fillHole_popup.exec_(self.fillHole_button.mapToGlobal(position))
+
+    def widgets_fillHole(self):
+        self.fillHole_button = QtWidgets.QPushButton("Fill Hole")
+        self.fillHole_button.setIcon(QtGui.QIcon(":polyCloseBorder.png"))
+        self.fillHole_button.setIconSize(QtCore.QSize(25, 20))
+        self.fillHole_button.clicked.connect(self.perform_fillHole)
+        self.fillHole_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.fillHole_button.customContextMenuRequested.connect(self.popup_fillHole) 
+        
+    def perform_reduce(self):
+        mel.eval('doPerformPolyReduceArgList 3 {"1","0","0","1","1","1","1","1","1","0.5","0.5","0.5","0.5","0.5","0.5","0","0.01","0","1","0","0.0","1","1","","1","1","50","0","0","1","0","0","0","0"};')
+        
+    def open_reduceOptions(self):
+        mel.eval("performPolyReduce 1;")
+        
+    def popup_reduce(self, position):
+        reduce_popup = QtWidgets.QMenu()
+        reduce_action = QtWidgets.QAction('Settings', self)
+        reduce_action.triggered.connect(self.open_reduceOptions)
+        reduce_popup.addAction(reduce_action)
+        reduce_popup.exec_(self.reduce_button.mapToGlobal(position))
+
+    def widgets_reduce(self):
+        self.reduce_button = QtWidgets.QPushButton("reduce")
+        self.reduce_button.setIcon(QtGui.QIcon(":polyReduce.png"))
+        self.reduce_button.setIconSize(QtCore.QSize(25, 20))
+        self.reduce_button.clicked.connect(self.perform_reduce)
+        self.reduce_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.reduce_button.customContextMenuRequested.connect(self.popup_reduce) 
+        
+    def perform_remesh(self):
+        mel.eval("polyRemesh -maxEdgeLength 1 -useRelativeValues 1 -collapseThreshold 20 -smoothStrength 0 -tessellateBorders 1 -interpolationType 2;")
+        
+    def open_remeshOptions(self):
+        mel.eval("performPolyRemesh 1;")
+        
+    def popup_remesh(self, position):
+        remesh_popup = QtWidgets.QMenu()
+        remesh_action = QtWidgets.QAction('Settings', self)
+        remesh_action.triggered.connect(self.open_remeshOptions)
+        remesh_popup.addAction(remesh_action)
+        remesh_popup.exec_(self.remesh_button.mapToGlobal(position))
+
+    def widgets_remesh(self):
+        self.remesh_button = QtWidgets.QPushButton("remesh")
+        self.remesh_button.setIcon(QtGui.QIcon(":polyRemesh.png"))
+        self.remesh_button.setIconSize(QtCore.QSize(25, 20))
+        self.remesh_button.clicked.connect(self.perform_remesh)
+        self.remesh_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.remesh_button.customContextMenuRequested.connect(self.popup_remesh) 
+        
+    def perform_retopo(self):
+        mel.eval("polyRetopo -constructionHistory 1 -replaceOriginal 1 -preserveHardEdges 0 -topologyRegularity 0.5 -faceUniformity 0 -anisotropy 0.75 -targetFaceCount 1000 -targetFaceCountTolerance 10;")
+        
+    def open_retopoOptions(self):
+        mel.eval("performPolyRetopo 1:")
+        
+    def popup_retopo(self, position):
+        retopo_popup = QtWidgets.QMenu()
+        retopo_action = QtWidgets.QAction('Settings', self)
+        retopo_action.triggered.connect(self.open_retopoOptions)
+        retopo_popup.addAction(retopo_action)
+        retopo_popup.exec_(self.retopo_button.mapToGlobal(position))
+
+    def widgets_retopo(self):
+        self.retopo_button = QtWidgets.QPushButton("retopo")
+        self.retopo_button.setIcon(QtGui.QIcon(":polyRetopo.png"))
+        self.retopo_button.setIconSize(QtCore.QSize(25, 20))
+        self.retopo_button.clicked.connect(self.perform_retopo)
+        self.retopo_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.retopo_button.customContextMenuRequested.connect(self.popup_retopo) 
+        
+    def perform_smooth(self):
+        mel.eval('polyPerformAction "polySmooth  -mth 0 -sdt 2 -ovb 1 -ofb 3 -ofc 0 -ost 0 -ocr 0 -dv 1 -peh 0 -bnr 1 -c 1 -kb 1 -ksb 1 -khe 0 -kt 1 -kmb 1 -suv 1 -sl 1 -dpe 1 -ps 0.1 -ro 1" f 0;')
+        
+    def open_smoothOptions(self):
+        mel.eval("performPolySmooth 1;")
+        
+    def popup_smooth(self, position):
+        smooth_popup = QtWidgets.QMenu()
+        smooth_action = QtWidgets.QAction('Settings', self)
+        smooth_action.triggered.connect(self.open_smoothOptions)
+        smooth_popup.addAction(smooth_action)
+        smooth_popup.exec_(self.smooth_button.mapToGlobal(position))
+
+    def widgets_smooth(self):
+        self.smooth_button = QtWidgets.QPushButton("smooth")
+        self.smooth_button.setIcon(QtGui.QIcon(":polySmooth.png"))
+        self.smooth_button.setIconSize(QtCore.QSize(25, 20))
+        self.smooth_button.clicked.connect(self.perform_smooth)
+        self.smooth_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.smooth_button.customContextMenuRequested.connect(self.popup_smooth) 
+        
+    def perform_triangulate(self):
+        mel.eval("polyPerformAction polytri f 0;")
+
+    def widgets_triangulate(self):
+        self.triangulate_button = QtWidgets.QPushButton("triangulate")
+        self.triangulate_button.setIcon(QtGui.QIcon(":polytri.png"))
+        self.triangulate_button.setIconSize(QtCore.QSize(25, 20))
+        self.triangulate_button.clicked.connect(self.perform_triangulate)
+        
+    def perform_quadrangulate(self):
+        mel.eval('polyPerformAction "polyQuad  -a 30 -kgb 1 -ktb 1 -khe 1 -ws 1" f 0;')
+        
+    def open_quadrangulateOptions(self):
+        mel.eval("performPolyQuadrangulate 1;")
+        
+    def popup_quadrangulate(self, position):
+        quadrangulate_popup = QtWidgets.QMenu()
+        quadrangulate_action = QtWidgets.QAction('Settings', self)
+        quadrangulate_action.triggered.connect(self.open_quadrangulateOptions)
+        quadrangulate_popup.addAction(quadrangulate_action)
+        quadrangulate_popup.exec_(self.quadrangulate_button.mapToGlobal(position))
+
+    def widgets_quadrangulate(self):
+        self.quadrangulate_button = QtWidgets.QPushButton("quad")
+        self.quadrangulate_button.setIcon(QtGui.QIcon(":polyQuad.png"))
+        self.quadrangulate_button.setIconSize(QtCore.QSize(25, 20))
+        self.quadrangulate_button.clicked.connect(self.perform_quadrangulate)
+        self.quadrangulate_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.quadrangulate_button.customContextMenuRequested.connect(self.popup_quadrangulate) 
+        
+
+        
+    def perform_mirror(self):
+        mel.eval('polyPerformAction "polyMirrorFace  -cutMesh 1 -axis 0 -axisDirection 0 -mergeMode 1 -mergeThresholdType 0 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0" "f" 0;')
+        
+    def open_mirrorOptions(self):
+        mel.eval("performPolyMirror 1;")
+        
+    def popup_mirror(self, position):
+        mirror_popup = QtWidgets.QMenu()
+        mirror_action = QtWidgets.QAction('Settings', self)
+        mirror_action.triggered.connect(self.open_mirrorOptions)
+        mirror_popup.addAction(mirror_action)
+        mirror_popup.exec_(self.mirror_button.mapToGlobal(position))
+
+    def widgets_mirror(self):
+        self.mirror_button = QtWidgets.QPushButton("mirror")
+        self.mirror_button.setIcon(QtGui.QIcon(":polyMirrorGeometry.png"))
+        self.mirror_button.setIconSize(QtCore.QSize(25, 20))
+        self.mirror_button.clicked.connect(self.perform_mirror)
+        self.mirror_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.mirror_button.customContextMenuRequested.connect(self.popup_mirror) 
+
             
     def create_widgets(self):
         
@@ -1337,69 +1659,6 @@ class SampleUI(QtWidgets.QWidget):
         self.mesh_menu = CollapsibleWidget("Mesh")
         self.mesh_menu.set_expanded(True)
         
-        self.union_button = QtWidgets.QPushButton("Union")
-        self.union_button.setIcon(QtGui.QIcon(":polyBooleansUnion.png"))
-        self.union_button.setIconSize(QtCore.QSize(25, 25))    
-        
-        self.difference_button = QtWidgets.QPushButton("Difference")
-        self.difference_button.setIcon(QtGui.QIcon(":polyBooleansDifference.png"))
-        self.difference_button.setIconSize(QtCore.QSize(25, 25))  
-        
-        self.intersection_button = QtWidgets.QPushButton("intersection ")
-        self.intersection_button.setIcon(QtGui.QIcon(":polyBooleansIntersection.png"))
-        self.intersection_button.setIconSize(QtCore.QSize(25, 25))  
-        
-        self.combine_button = QtWidgets.QPushButton("Combine")
-        self.combine_button.setIcon(QtGui.QIcon(":polyUnite.png"))
-        self.combine_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.seperate_button = QtWidgets.QPushButton("Seperate")
-        self.seperate_button.setIcon(QtGui.QIcon(":polySeparate.png"))
-        self.seperate_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.conform_button = QtWidgets.QPushButton("Conform")
-        self.conform_button.setIcon(QtGui.QIcon(":polySeparate.png"))
-        self.conform_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.fillHole_button = QtWidgets.QPushButton("CFill Hole")
-        self.fillHole_button.setIcon(QtGui.QIcon(":polyCloseBorder.png"))
-        self.fillHole_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.reduce_button = QtWidgets.QPushButton("Reduce")
-        self.reduce_button.setIcon(QtGui.QIcon(":polyReduce.png"))
-        self.reduce_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.remesh_button = QtWidgets.QPushButton("Remesh")
-        self.remesh_button.setIcon(QtGui.QIcon(":polyRemesh.png"))
-        self.remesh_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.retopo_button = QtWidgets.QPushButton("Retopo")
-        self.retopo_button.setIcon(QtGui.QIcon(":polyRetopo.png"))
-        self.retopo_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.retopo_button = QtWidgets.QPushButton("Retopo")
-        self.retopo_button.setIcon(QtGui.QIcon(":polyRetopo.png"))
-        self.retopo_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.smooth_button = QtWidgets.QPushButton("Smooth")
-        self.smooth_button.setIcon(QtGui.QIcon(":polySmooth.png"))
-        self.smooth_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.smooth_button = QtWidgets.QPushButton("Smooth")
-        self.smooth_button.setIcon(QtGui.QIcon(":polySmooth.png"))
-        self.smooth_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.triangulate_button = QtWidgets.QPushButton("Tri")
-        self.triangulate_button.setIcon(QtGui.QIcon(":polyTriangulate.png"))
-        self.triangulate_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.quadrangulate_button = QtWidgets.QPushButton("Quad")
-        self.quadrangulate_button.setIcon(QtGui.QIcon(":polyQuad.png"))
-        self.quadrangulate_button.setIconSize(QtCore.QSize(25, 25))
-        
-        self.mirror_button = QtWidgets.QPushButton("Mirror")
-        self.mirror_button.setIcon(QtGui.QIcon(":polyMirrorGeometry.png"))
-        self.mirror_button.setIconSize(QtCore.QSize(25, 25))
         
     def widgets_sculpting(self):    
         self.sculpting_menu = CollapsibleWidget("Sculpting")
@@ -1552,18 +1811,11 @@ class SampleUI(QtWidgets.QWidget):
         #Mesh Tools
         self.meshTools_menu = CollapsibleWidget("Mesh Tools")
         self.meshTools_menu.set_expanded(True)
-
-        self.polyAppend_button= QtWidgets.QPushButton("Poly Append")
-        self.polyAppend_button.setIcon(QtGui.QIcon(":polyAppendFacet.png"))
-        self.polyAppend_button.setIconSize(QtCore.QSize(25, 25)) 
         
         self.connect_button= QtWidgets.QPushButton("connect")
         self.connect_button.setIcon(QtGui.QIcon(":connect_NEX32.png"))
         self.connect_button.setIconSize(QtCore.QSize(25, 25)) 
-        
-        self.polyCrease_button= QtWidgets.QPushButton("Crease")
-        self.polyCrease_button.setIcon(QtGui.QIcon(":polyCrease.png"))
-        self.polyCrease_button.setIconSize(QtCore.QSize(25, 25)) 
+    
         
         self.createPoly_button= QtWidgets.QPushButton("Create Poly")
         self.createPoly_button.setIcon(QtGui.QIcon(":polyCreateFacet.png"))
@@ -1678,12 +1930,11 @@ class SampleUI(QtWidgets.QWidget):
         
         mesh_layout2 = QtWidgets.QHBoxLayout()
         mesh_layout2.addWidget(self.combine_button)
-        mesh_layout2.addWidget(self.seperate_button)
+        mesh_layout2.addWidget(self.separate_button)
         mesh_layout2.addWidget(self.conform_button)
         mesh_layout2.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout3 = QtWidgets.QHBoxLayout()
-        #mesh_layout3.addWidget(self.fillHole_button)
         mesh_layout3.addWidget(self.reduce_button)
         mesh_layout3.addWidget(self.remesh_button)
         mesh_layout3.addWidget(self.retopo_button)
@@ -1694,6 +1945,7 @@ class SampleUI(QtWidgets.QWidget):
         
         mesh_layout5 = QtWidgets.QHBoxLayout()
         mesh_layout5.addWidget(self.smooth_button)
+        mesh_layout5.addWidget(self.divide_button)
         mesh_layout5.addWidget(self.triangulate_button)
         mesh_layout5.addWidget(self.quadrangulate_button)
         mesh_layout5.setAlignment(QtCore.Qt.AlignTop)
@@ -1703,26 +1955,32 @@ class SampleUI(QtWidgets.QWidget):
         mesh_layout5.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout1 = QtWidgets.QHBoxLayout()
-        editMesh_layout1.addWidget(self.divide_button)
-        editMesh_layout1.addWidget(self.bevel_button)
+        #editMesh_layout1.addWidget(self.divide_button)
+        #editMesh_layout1.addWidget(self.bevel_button)
+        
+        editMesh_layout1.addWidget(self.connect_button)
         editMesh_layout1.addWidget(self.bridge_button)
         editMesh_layout1.setAlignment(QtCore.Qt.AlignTop)
         
+        
         editMesh_layout2 = QtWidgets.QHBoxLayout()
+        editMesh_layout2.addWidget(self.appendFacet_button)
+        editMesh_layout2.addWidget(self.transform_button)
         editMesh_layout2.addWidget(self.circularize_button)
         editMesh_layout2.addWidget(self.collapseEdge_button)
         editMesh_layout2.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout3 = QtWidgets.QHBoxLayout()
-        editMesh_layout3.addWidget(self.connect_button)
-        editMesh_layout3.addWidget(self.detach_button)
+        #editMesh_layout3.addWidget(self.connect_button)
+        editMesh_layout3.addWidget(self.bevel_button)
         editMesh_layout3.addWidget(self.extrude_button)
         editMesh_layout3.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout4 = QtWidgets.QHBoxLayout()
         editMesh_layout4.addWidget(self.merge_button)
         editMesh_layout4.addWidget(self.mergeToCenter_button)
-        editMesh_layout4.addWidget(self.transform_button)
+        editMesh_layout4.addWidget(self.targetWeld_button)
+        #editMesh_layout4.addWidget(self.transform_button)
         editMesh_layout4.setAlignment(QtCore.Qt.AlignTop)
     
         editMesh_layout5 = QtWidgets.QHBoxLayout()
@@ -1731,64 +1989,68 @@ class SampleUI(QtWidgets.QWidget):
         editMesh_layout5.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout6 = QtWidgets.QHBoxLayout()
-        editMesh_layout6.addWidget(self.average_button)
-        editMesh_layout6.addWidget(self.chamfer_button)
-        editMesh_layout6.addWidget(self.reorder_button)
+        editMesh_layout6.addWidget(self.detach_button)
+        editMesh_layout6.addWidget(self.extract_button)
+        #editMesh_layout6.addWidget(self.reorder_button)
         editMesh_layout6.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout7 = QtWidgets.QHBoxLayout()
+        editMesh_layout7.addWidget(self.average_button)
         editMesh_layout7.addWidget(self.delEdge_button)
         editMesh_layout7.addWidget(self.edgeFlow_button)
-        editMesh_layout7.addWidget(self.flipEdge_button)
         editMesh_layout7.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout8 = QtWidgets.QHBoxLayout()
         editMesh_layout8.addWidget(self.spinEdgeBackward_button)
         editMesh_layout8.addWidget(self.spinEdgeForward_button)
         editMesh_layout8.addWidget(self.invisibleFace_button)
+        editMesh_layout8.addWidget(self.createPoly_button)
         editMesh_layout8.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout9 = QtWidgets.QHBoxLayout()
         editMesh_layout9.addWidget(self.duplicateFacet_button)
-        editMesh_layout9.addWidget(self.extract_button)
+        editMesh_layout9.addWidget(self.chamfer_button)
         editMesh_layout9.addWidget(self.poke_button)
         editMesh_layout9.addWidget(self.wedge_button)
         editMesh_layout9.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout10 = QtWidgets.QHBoxLayout()
+        editMesh_layout10.addWidget(self.reorder_button)
+        editMesh_layout10.addWidget(self.flipEdge_button)
         editMesh_layout10.addWidget(self.projectCurve_button)
         editMesh_layout10.addWidget(self.curveSplit_button)
         editMesh_layout10.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout1 = QtWidgets.QHBoxLayout()
-        meshTools_layout1.addWidget(self.polyAppend_button)
-        meshTools_layout1.addWidget(self.connect_button)
-        meshTools_layout1.addWidget(self.polyCrease_button)
+        #meshTools_layout1.addWidget(self.appendFacet_button)
+        
+        meshTools_layout1.addWidget(self.slideEdge_button)
+        meshTools_layout1.addWidget(self.crease_button)
         meshTools_layout1.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout2 = QtWidgets.QHBoxLayout()
-        meshTools_layout2.addWidget(self.createPoly_button)
+        #meshTools_layout2.addWidget(self.createPoly_button)
+        #meshTools_layout2.addWidget(self.insertEdge_button)
         meshTools_layout2.addWidget(self.insertEdge_button)
+        meshTools_layout2.addWidget(self.offsetEdge_button)
+        meshTools_layout2.addWidget(self.fillHole_button)
         meshTools_layout2.addWidget(self.makeHole_button)
         meshTools_layout2.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout3 = QtWidgets.QHBoxLayout()
-        meshTools_layout3.addWidget(self.multiCut_button)
-        meshTools_layout3.addWidget(self.offsetEdge_button)
+        #meshTools_layout3.addWidget(self.multiCut_button)
+
         meshTools_layout3.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout4 = QtWidgets.QHBoxLayout()
         meshTools_layout4.addWidget(self.quadDraw_button)
+        meshTools_layout4.addWidget(self.multiCut_button)
         meshTools_layout4.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout5 = QtWidgets.QHBoxLayout()
         meshTools_layout5.addWidget(self.slideEdge_button)
-        meshTools_layout5.addWidget(self.targetWeld_button)
+        #meshTools_layout5.addWidget(self.targetWeld_button)
         meshTools_layout5.setAlignment(QtCore.Qt.AlignTop)
-        
-        empty_layout = QtWidgets.QHBoxLayout()
-        empty_layout.addStretch()
-        empty_layout.addStrut(2000)
         
         #self.setCentralWidget(scrollable_widget)
         main_layout = QtWidgets.QVBoxLayout(self)
@@ -1823,23 +2085,26 @@ class SampleUI(QtWidgets.QWidget):
         self.mesh_menu.add_layout(mesh_layout5)
         self.mesh_menu.add_layout(mesh_layout6)
         scrollable_widget.add_widget(self.editMesh_menu)
+        self.editMesh_menu.add_layout(meshTools_layout4)
         self.editMesh_menu.add_layout(editMesh_layout1)
         self.editMesh_menu.add_layout(editMesh_layout3)
         self.editMesh_menu.add_layout(editMesh_layout4)
         self.editMesh_menu.add_layout(editMesh_layout5)
         self.editMesh_menu.add_layout(editMesh_layout6)
         self.editMesh_menu.add_layout(editMesh_layout7)
+        self.editMesh_menu.add_layout(meshTools_layout1) 
+        
         self.editMesh_menu.add_widget(self.editMesh_menuSec)
         self.editMesh_menuSec.add_layout(editMesh_layout2)
         self.editMesh_menuSec.add_layout(editMesh_layout8)
         self.editMesh_menuSec.add_layout(editMesh_layout9)
         self.editMesh_menuSec.add_layout(editMesh_layout10)
+        self.editMesh_menuSec.add_layout(meshTools_layout2)
         scrollable_widget.add_widget(self.meshTools_menu)
         self.meshTools_menu.add_layout(meshTools_layout1)   
-        self.meshTools_menu.add_layout(meshTools_layout2)   
         self.meshTools_menu.add_layout(meshTools_layout3)    
-        self.meshTools_menu.add_layout(meshTools_layout4)  
-        self.meshTools_menu.add_layout(meshTools_layout5)  
+        #self.meshTools_menu.add_layout(meshTools_layout4)  
+        #self.meshTools_menu.add_layout(meshTools_layout5)  
         
         scroll_layout = QtWidgets.QVBoxLayout(self)
         scrollable_widget.add_layout(scroll_layout)
@@ -1859,7 +2124,7 @@ class SampleUI(QtWidgets.QWidget):
         self.difference_button.clicked.connect(self.perform_booleanDifference)
         self.intersection_button.clicked.connect(self.perform_booleanIntersection)
         self.combine_button.clicked.connect(self.perform_combine)
-        self.seperate_button.clicked.connect(self.perform_seperate)
+        self.separate_button.clicked.connect(self.perform_separate)
         self.conform_button.clicked.connect(self.perform_conform)
         self.fillHole_button.clicked.connect(self.perform_fillHole)
         self.reduce_button.clicked.connect(self.perform_reduce)
@@ -1915,7 +2180,7 @@ class SampleUI(QtWidgets.QWidget):
     def perform_combine(self):
         cmds.polyUnite()
         
-    def perform_seperate(self):
+    def perform_separate(self):
         cmds.polySeparate()
         
     def perform_conform(self):
