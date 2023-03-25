@@ -4,11 +4,56 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from shiboken2 import getCppPointer
-
+import maya.api.OpenMaya as om
 import maya.OpenMayaUI as omui
 import maya.cmds as cmds
 import maya.mel as mel
 
+def maya_useNewAPI():
+    """
+    The presence of this function tells Maya that the plugin produces, and
+    expects to be passed, objects created using the Maya Python API 2.0.
+    """
+    pass
+    
+def initializePlugin(plugin):
+    """
+    Entry point for a plugin. It is called once -- immediately after the plugin is loaded.
+    This function registers all of the commands, nodes, contexts, etc... associated with the plugin.
+
+    It is required by all plugins.
+
+    :param plugin: MObject used to register the plugin using an MFnPlugin function set
+    """
+    vendor = "Robert Braddy"
+    version = "1.0.0"
+
+    om.MFnPlugin(plugin, vendor, version)
+    global sample_ui
+    sample_ui = SampleUI()
+    
+def uninitializePlugin(plugin):
+    """
+    Exit point for a plugin. It is called once -- when the plugin is unloaded.
+    This function de-registers everything that was registered in the initializePlugin function.
+
+    It is required by all plugins.
+
+    :param plugin: MObject used to de-register the plugin using an MFnPlugin function set
+    """
+    try:
+        workspace_control_name = SampleUI.get_workspace_control_name()
+
+        sample_ui.undock()
+        if cmds.window(workspace_control_name, exists=True):
+            cmds.deleteUI(workspace_control_name)  
+        try:
+            sample_ui.setParent(None)
+            sample_ui.deleteLater()
+        except:
+            pass  
+    except:
+        pass
 
 class WorkspaceControl(object):
 
@@ -63,6 +108,11 @@ class WorkspaceControl(object):
 
     def is_collapsed(self):
         return cmds.workspaceControl(self.name, q=True, collapse=True)
+    
+    def set_floating(self):
+        print "undocking"
+        cmds.workspaceControl(self.name, floating=True, edit=True)       
+
         
         
 class ScrollableWidget(QtWidgets.QWidget):
@@ -233,15 +283,30 @@ class SampleUI(QtWidgets.QWidget):
 
     @classmethod
     def get_workspace_control_name(cls):
-        return "{0}WorkspaceControl".format(cls.UI_NAME)
+        return "{0}WorkspaceControl".format(cls.UI_NAME)    
+    
+    @classmethod    
+    def undock(self):
+        self.workspace_control_instance = WorkspaceControl(self.get_workspace_control_name())
+        print "this"
+        self.workspace_control_instance.set_floating()
+            
+    def create_workspace_control(self):
+        self.workspace_control_instance = WorkspaceControl(self.get_workspace_control_name())
+        if self.workspace_control_instance.exists():
+            self.workspace_control_instance.restore(self)
+        else:
+            self.workspace_control_instance.create(self.WINDOW_TITLE, self, ui_script="from workspace_control import SampleUI\nSampleUI.display()")
 
-
+    def show_workspace_control(self):
+        self.workspace_control_instance.set_visible(True)
+                        
     def __init__(self):
         super(SampleUI, self).__init__()
 
         self.setObjectName(self.__class__.UI_NAME)
         self.setMinimumSize(150, 100)
-        self.create_widgets_history()
+        self.widgets_history()
         self.widgets_sphere()
         self.widgets_cube()
         self.widgets_cylinder()
@@ -253,14 +318,13 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_helix()
         self.widgets_pipe()
         self.widgets_platonic()
-        self.widgets_primatives()
         self.widgets_prism()
         self.widgets_pyramid()
         self.widgets_soccer()
         self.widgets_superEllipse()
         self.widgets_sphericalHarm()
         self.widgets_ultraShape()
-        self.widgets_extra()
+        self.widgets_collapsables()
         self.widgets_sculpting()
         self.widgets_divide()
         self.widgets_bevel()
@@ -316,6 +380,11 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_intersection()
         self.widgets_difference()
         self.widgets_union()
+        self.widgets_centerPivot()
+        self.widgets_bakePivot()
+        self.widgets_zeroPivot()
+        self.widgets_freezeTransform()
+        self.widgets_resetTransform()
         self.create_layout()
         self.create_connections()
         self.create_workspace_control()
@@ -323,20 +392,117 @@ class SampleUI(QtWidgets.QWidget):
     def set_text(self, text):
         self.text_label.setText("<b>{0}</b>".format(text))
     
-    def create_widgets_history(self):
+    def widgets_history(self):
 
-        
         self.deleteHistory_button = QtWidgets.QPushButton("History")
         self.deleteHistory_button.setIcon(QtGui.QIcon(":deleteClip.png"))
         self.deleteHistory_button.setIconSize(QtCore.QSize(25, 15))
+        self.deleteHistory_button.clicked.connect(self.delete_history)
         
         self.deleteNonDefHistory_button = QtWidgets.QPushButton("ND History")
         self.deleteNonDefHistory_button.setIcon(QtGui.QIcon(":deleteClip.png"))
         self.deleteNonDefHistory_button.setIconSize(QtCore.QSize(25, 15))
+        self.deleteNonDefHistory_button.clicked.connect(self.delete_nonDifHistory)
         
-        self.history_tools = CollapsibleWidget("Delete History")
-        self.history_tools.set_expanded(True)
-    
+    def perform_centerPivot(self):
+        mel.eval("CenterPivot;")
+        
+    def widgets_centerPivot(self):
+        self.centerPivot_button = QtWidgets.QPushButton("Center Piv")
+        self.centerPivot_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.centerPivot_button.setIconSize(QtCore.QSize(25, 20))
+        self.centerPivot_button.clicked.connect(self.perform_centerPivot)
+
+        
+    def perform_bakePivot(self):
+        mel.eval("BakeCustomPivot;")
+        
+    def open_bakePivotOptions(self):
+        mel.eval("BakeCustomPivotOptions;")
+        
+    def popup_bakePivot(self, position):
+        bakePivot_popup = QtWidgets.QMenu()
+        bakePivot_action = QtWidgets.QAction('Settings', self)
+        bakePivot_action.triggered.connect(self.open_bakePivotOptions)
+        bakePivot_popup.addAction(bakePivot_action)
+        bakePivot_popup.exec_(self.bakePivot_button.mapToGlobal(position))
+
+    def widgets_bakePivot(self):
+        self.bakePivot_button = QtWidgets.QPushButton("Bake Piv")
+        self.bakePivot_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.bakePivot_button.setIconSize(QtCore.QSize(25, 20))
+        self.bakePivot_button.clicked.connect(self.perform_bakePivot)
+        self.bakePivot_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.bakePivot_button.customContextMenuRequested.connect(self.popup_bakePivot) 
+        
+    def perform_zeroPivot(self):
+        node_list = cmds.ls( sl=True )
+        if not node_list:
+            cmds.error( 'Select one or more nodes to zero its transforms.' )
+
+        for node in node_list:
+            parent = None
+            try:
+                parent = cmds.listRelatives( node, p=True )[0]
+            except:
+                pass
+                
+            if parent:
+                node = cmds.parent( node, w=True )[0]
+                
+            cmds.xform(node,piv=[0, 0, 0],ws=True,)
+            cmds.makeIdentity(node,apply=True,t=True,r=True,s=True)
+
+        cmds.select( node_list, r=True )
+
+    def widgets_zeroPivot(self):
+        self.zeroPivot_button = QtWidgets.QPushButton("Zero Piv")
+        self.zeroPivot_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.zeroPivot_button.setIconSize(QtCore.QSize(25, 20))
+        self.zeroPivot_button.clicked.connect(self.perform_zeroPivot)
+        
+    def perform_freezeTransform(self):
+        mel.eval("FreezeTransformations;")
+        
+    def open_freezeTransformOptions(self):
+        mel.eval("FreezeTransformationsOptions;")
+        
+    def popup_freezeTransform(self, position):
+        freezeTransform_popup = QtWidgets.QMenu()
+        freezeTransform_action = QtWidgets.QAction('Settings', self)
+        freezeTransform_action.triggered.connect(self.open_freezeTransformOptions)
+        freezeTransform_popup.addAction(freezeTransform_action)
+        freezeTransform_popup.exec_(self.freezeTransform_button.mapToGlobal(position))
+
+    def widgets_freezeTransform(self):
+        self.freezeTransform_button = QtWidgets.QPushButton("Freeze Transforms")
+        self.freezeTransform_button.setIcon(QtGui.QIcon(":polyfreezeTransformFacet.png"))
+        self.freezeTransform_button.setIconSize(QtCore.QSize(25, 20))
+        self.freezeTransform_button.clicked.connect(self.perform_freezeTransform)
+        self.freezeTransform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.freezeTransform_button.customContextMenuRequested.connect(self.popup_freezeTransform) 
+        
+    def perform_resetTransform(self):
+        mel.eval("ResetTransformations;")
+        
+    def open_resetTransformOptions(self):
+        mel.eval("ResetTransformationsOptions;")
+        
+    def popup_resetTransform(self, position):
+        resetTransform_popup = QtWidgets.QMenu()
+        resetTransform_action = QtWidgets.QAction('Settings', self)
+        resetTransform_action.triggered.connect(self.open_resetTransformOptions)
+        resetTransform_popup.addAction(resetTransform_action)
+        resetTransform_popup.exec_(self.resetTransform_button.mapToGlobal(position))
+
+    def widgets_resetTransform(self):
+        self.resetTransform_button = QtWidgets.QPushButton("Reset Transforms")
+        self.resetTransform_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.resetTransform_button.setIconSize(QtCore.QSize(25, 20))
+        self.resetTransform_button.clicked.connect(self.perform_resetTransform)
+        self.resetTransform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.resetTransform_button.customContextMenuRequested.connect(self.popup_resetTransform) 
+
     def create_sphere(self):
         mel.eval("CreatePolygonSphere;")
         
@@ -573,36 +739,13 @@ class SampleUI(QtWidgets.QWidget):
         self.ultraShape_button = QtWidgets.QPushButton("")
         self.ultraShape_button.setIcon(QtGui.QIcon(":polyUltraShape.png"))
         self.ultraShape_button.setIconSize(QtCore.QSize(25, 25))
-    
-    def widgets_primatives(self):    
-        self.polygon_primatives = CollapsibleWidget("Polygon Primatives")
-        self.polygon_primatives.set_expanded(True)
-        self.polygon_primativesSec = CollapsibleWidget("")
-        self.polygon_primativesSec.set_expanded(False)
-        self.polygon_primativesSec.set_Margins(4,0,0,0)
-        self.polygon_primativesSec.set_header_background_color(QtGui.QColor(125,125, 125, 0))
-        
+
     def create_connections_primatives(self):
         self.deleteHistory_button.clicked.connect(self.delete_history)
         self.deleteNonDefHistory_button.clicked.connect(self.delete_nonDifHistory)
-        '''
-        self.cylinder_button.clicked.connect(self.create_cylinder)
-        self.cone_button.clicked.connect(self.create_cone)
-        self.torus_button.clicked.connect(self.create_torus)
-        self.plane_button.clicked.connect(self.create_plane)
-        self.disc_button.clicked.connect(self.create_disc)
-        self.platonic_button.clicked.connect(self.create_platonicSolid)
-        self.pyramid_button.clicked.connect(self.create_pyramid)
-        self.prism_button.clicked.connect(self.create_prism)
-        self.pipe_button.clicked.connect(self.create_pipe)
-        self.helix_button.clicked.connect(self.create_helix)
-        self.gear_button.clicked.connect(self.create_gear)
-        self.soccer_button.clicked.connect(self.create_soccerBall)
-        self.superEllipse_button.clicked.connect(self.create_superEllipse)
-        '''
 
 
-        
+
     def perform_divide(self):
         print "running"
         mel.eval("SubdividePolygon;")
@@ -1626,9 +1769,7 @@ class SampleUI(QtWidgets.QWidget):
         self.quadrangulate_button.clicked.connect(self.perform_quadrangulate)
         self.quadrangulate_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.quadrangulate_button.customContextMenuRequested.connect(self.popup_quadrangulate) 
-        
-
-        
+            
     def perform_mirror(self):
         mel.eval('polyPerformAction "polyMirrorFace  -cutMesh 1 -axis 0 -axisDirection 0 -mergeMode 1 -mergeThresholdType 0 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0" "f" 0;')
         
@@ -1731,21 +1872,31 @@ class SampleUI(QtWidgets.QWidget):
         self.sculptObjects_button.setIcon(QtGui.QIcon(":Objects.png"))
         self.sculptObjects_button.setIconSize(QtCore.QSize(25, 25)) 
 
+    def widgets_collapsables(self): 
         
-
-
-    
-    def widgets_extra(self): 
-        self.mesh_menu = CollapsibleWidget("Mesh")
-        self.mesh_menu.set_expanded(True)
+        self.history_tools = CollapsibleWidget("Delete History")
+        self.history_tools.set_expanded(True)
+        self.modify_tools = CollapsibleWidget("Modify")
+        self.modify_tools.set_expanded(False)
         
+        self.polygon_primatives = CollapsibleWidget("Polygon Primatives")
+        self.polygon_primatives.set_expanded(True)
+        self.polygon_primativesSec = CollapsibleWidget("")
+        self.polygon_primativesSec.set_expanded(False)
+        self.polygon_primativesSec.set_Margins(4,0,0,0)
+        self.polygon_primativesSec.set_header_background_color(QtGui.QColor(125,125, 125, 0))
+ 
         self.sculpting_menu = CollapsibleWidget("Sculpting")
         self.sculpting_menu.set_expanded(True)
         
         self.secSculpting_menu = CollapsibleWidget("")
         self.secSculpting_menu.set_expanded(False)
         self.secSculpting_menu.set_Margins(4,0,0,0)
-        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0))
+        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0))       
+        
+        self.mesh_menu = CollapsibleWidget("Mesh")
+        self.mesh_menu.set_expanded(True)
+        
         # Edit Mesh Tools          
         self.editMesh_menu = CollapsibleWidget("Edit Mesh Tools  ")
         self.editMesh_menu.set_expanded(True)  
@@ -1764,7 +1915,15 @@ class SampleUI(QtWidgets.QWidget):
         history_layout1 = QtWidgets.QHBoxLayout()
         history_layout1.addWidget(self.deleteHistory_button)
         history_layout1.addWidget(self.deleteNonDefHistory_button)
-        history_layout1.setAlignment(QtCore.Qt.AlignTop)
+        
+        modify_layout0 = QtWidgets.QHBoxLayout()
+        modify_layout0.addWidget(self.freezeTransform_button)
+        modify_layout0.addWidget(self.resetTransform_button)
+        
+        modify_layout1 = QtWidgets.QHBoxLayout()
+        modify_layout1.addWidget(self.centerPivot_button)
+        modify_layout1.addWidget(self.bakePivot_button)
+        modify_layout1.addWidget(self.zeroPivot_button)
         
         prim_layout1 = QtWidgets.QHBoxLayout()
         prim_layout1.addWidget(self.sphere_button)
@@ -1965,7 +2124,9 @@ class SampleUI(QtWidgets.QWidget):
 
         scrollable_widget.add_widget(self.history_tools)
         self.history_tools.add_layout(history_layout1)     
-        self.history_tools.add_layout(history_layout1)
+        scrollable_widget.add_widget(self.modify_tools)
+        self.modify_tools.add_layout(modify_layout0)
+        self.modify_tools.add_layout(modify_layout1)
         scrollable_widget.add_widget(self.polygon_primatives)
         self.polygon_primatives.add_layout(prim_layout1)
         self.polygon_primatives.add_widget(self.polygon_primativesSec)
@@ -2044,16 +2205,6 @@ class SampleUI(QtWidgets.QWidget):
         self.sculptPinch_button.clicked.connect(self.set_meshPinchTool)
         self.sculptFlatten_button.clicked.connect(self.set_meshFlattenTool)
         self.sculptObjects_button .clicked.connect(self.set_meshObjectTool)
-
-    def create_workspace_control(self):
-        self.workspace_control_instance = WorkspaceControl(self.get_workspace_control_name())
-        if self.workspace_control_instance.exists():
-            self.workspace_control_instance.restore(self)
-        else:
-            self.workspace_control_instance.create(self.WINDOW_TITLE, self, ui_script="from workspace_control import SampleUI\nSampleUI.display()")
-
-    def show_workspace_control(self):
-        self.workspace_control_instance.set_visible(True)
 
     def on_clicked(self):
         print("Button Clicked")
@@ -2144,14 +2295,14 @@ class SampleUI(QtWidgets.QWidget):
 if __name__ == "__main__":
 
     workspace_control_name = SampleUI.get_workspace_control_name()
-    if cmds.window(workspace_control_name, exists=True):
-        cmds.deleteUI(workspace_control_name)
 
+    if cmds.window(workspace_control_name, exists=True):
+        cmds.deleteUI(workspace_control_name)  
     try:
         sample_ui.setParent(None)
         sample_ui.deleteLater()
     except:
-        pass
+        pass  
 
+ 
     sample_ui = SampleUI()
-
