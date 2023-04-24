@@ -406,8 +406,10 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_toggleCamBasedSelOn()
         self.widgets_marquee()
         self.widgets_drag()
-        self.widgets_preserveUVs()
-        self.widgets_preserveChildren()
+        self.widgets_preserveUVsOff()
+        self.widgets_preserveUVsOn()
+        self.widgets_preserveChildrenOff()
+        self.widgets_preserveChildrenOn()
         self.widgets_tweakMode()
         self.widgets_edgeConstraint()
         self.create_layout()
@@ -1659,7 +1661,7 @@ class SampleUI(QtWidgets.QWidget):
 
     def widgets_combine(self):
         self.combine_button = QtWidgets.QPushButton("combine")
-        self.combine_button.setIcon(QtGui.QIcon(":polycombineFacet.png"))
+        self.combine_button.setIcon(QtGui.QIcon(":polyUnite.png"))
         self.combine_button.setIconSize(QtCore.QSize(25, 20))
         self.combine_button.clicked.connect(self.perform_combine)
         self.combine_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -1823,7 +1825,7 @@ class SampleUI(QtWidgets.QWidget):
         self.quadrangulate_button.customContextMenuRequested.connect(self.popup_quadrangulate) 
             
     def perform_mirror(self):
-        mel.eval('polyPerformAction "polyMirrorFace  -cutMesh 1 -axis 0 -axisDirection 0 -mergeMode 1 -mergeThresholdType 0 -mergeThreshold 0.001 -mirrorAxis 2 -mirrorPosition 0 -smoothingAngle 30 -flipUVs 0" "f" 0;')
+        mel.eval('MirrorPolygonGeometry;')
         
     def open_mirrorOptions(self):
         mel.eval("performPolyMirror 1;")
@@ -2017,19 +2019,43 @@ class SampleUI(QtWidgets.QWidget):
         
     def set_preserveUVs(self):
         mel.eval("setTRSPreserveUVs(!`optionVar -q trsManipsPreserveUvs`)")
+        
+        currentMode=cmds.selectPref(query=True,useDepth=True)
+        
+        if currentMode == False:
+            self.preserveUVsOff_button.setHidden(False)
+            self.preserveUVsOn_button.setHidden(True)
+        else:
+            self.preserveUVsOff_button.setHidden(True)
+            self.preserveUVsOn_button.setHidden(False)
+            
 
-    def widgets_preserveUVs(self):
-        self.preserveUVs_button = QtWidgets.QPushButton("Preserve UVs")
-        self.preserveUVs_button.setIconSize(QtCore.QSize(40, 30))
-        self.preserveUVs_button.clicked.connect(self.set_preserveUVs)
+    def widgets_preserveUVsOff(self):
+        self.preserveUVsOff_button = QtWidgets.QPushButton("Preserve UVs")
+        self.preserveUVsOff_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveUVsOff_button.clicked.connect(self.set_preserveUVs)
+        
+    def widgets_preserveUVsOn(self):
+        self.preserveUVsOn_button = QtWidgets.QPushButton("Preserve UVs")
+        self.preserveUVsOn_button.setStyleSheet("background-color: darkblue;")
+        self.preserveUVsOn_button.setHidden(True)
+        self.preserveUVsOn_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveUVsOn_button.clicked.connect(self.set_preserveUVs)
         
     def set_preserveChildren(self):
         mel.eval("setTRSPreserveChildPosition(!`optionVar -q TRSPreserveChildPosition`)")
 
-    def widgets_preserveChildren(self):
-        self.preserveChildren_button = QtWidgets.QPushButton("Preserve Children")
-        self.preserveChildren_button.setIconSize(QtCore.QSize(40, 30))
-        self.preserveChildren_button.clicked.connect(self.set_preserveChildren)
+    def widgets_preserveChildrenOff(self):
+        self.preserveChildrenOff_button = QtWidgets.QPushButton("Preserve Children")
+        self.preserveChildrenOff_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveChildrenOff_button.clicked.connect(self.set_preserveChildren)
+        
+    def widgets_preserveChildrenOn(self):
+        self.preserveChildrenOn_button = QtWidgets.QPushButton("Preserve Children")
+        self.preserveChildrenOn_button.setStyleSheet("background-color: darkblue;")
+        self.preserveChildrenOn_button.setHidden(True)
+        self.preserveChildrenOn_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveChildrenOn_button.clicked.connect(self.set_preserveChildren)
         
     def set_tweakMode(self):
         mel.eval("setTRSPreserveChildPosition(!`optionVar -q TRSPreserveChildPosition`)")
@@ -2040,7 +2066,9 @@ class SampleUI(QtWidgets.QWidget):
         self.tweakMode_button.clicked.connect(self.set_tweakMode)
         
         
-    def set_edgeConstraint(self):    
+    def set_edgeConstraint(self):
+        pass
+        '''
         if not constraint_state:
             constraint_state = 0
         global constraint_state
@@ -2050,6 +2078,7 @@ class SampleUI(QtWidgets.QWidget):
         else:
             cmds.dR_slideOff()
             constraint_state = 0
+        '''
             
     def widgets_edgeConstraint(self):
         self.edgeConstraint_button = QtWidgets.QPushButton("Edge Constraint")
@@ -2228,8 +2257,10 @@ class SampleUI(QtWidgets.QWidget):
         selection_layout2.addWidget(self.tweakMode_button)
         
         selection_layout3 = QtWidgets.QHBoxLayout()
-        selection_layout3.addWidget(self.preserveUVs_button)
-        selection_layout3.addWidget(self.preserveChildren_button)
+        selection_layout3.addWidget(self.preserveUVsOff_button)
+        selection_layout3.addWidget(self.preserveUVsOn_button)
+        selection_layout3.addWidget(self.preserveChildrenOff_button)
+        selection_layout3.addWidget(self.preserveChildrenOn_button)
         
         selection_layout4 = QtWidgets.QHBoxLayout()
         selection_layout4.addWidget(self.edgeConstraint_button)
@@ -2666,8 +2697,6 @@ class SampleUI(QtWidgets.QWidget):
     def perform_quadrangulate(self):
         cmds.polyQuad()
         
-    def perform_mirror(self):
-        cmds.polyMirrorFace(cutMesh=1,axis=0,axisDirection=0,mergeMode=1,mergeThresholdType=0,mergeThreshold=0.001,mirrorAxis=2,mirrorPosition=0,smoothingAngle=30,flipUVs=0,ch=1)
 
     def set_meshSculptTool(self):
         cmds.SetMeshSculptTool()
@@ -2699,16 +2728,35 @@ class SampleUI(QtWidgets.QWidget):
 class UIEventFilter(QtCore.QObject):
 
     def eventFilter(self, watched, event):
+        
+        preserveUvSetting = cmds.optionVar(q="trsManipsPreserveUvs")
+        if preserveUvSetting==0:
 
-        camBased= cmds.selectPref(q=True, useDepth=True)
+            sample_ui.preserveUVsOff_button.setHidden(False)
+            sample_ui.preserveUVsOn_button.setHidden(True)
+        else:
+            sample_ui.preserveUVsOff_button.setHidden(True)
+            sample_ui.preserveUVsOn_button.setHidden(False)
 
-        if camBased==True:
+        camBasedSetting= cmds.selectPref(q=True, useDepth=True)
+        if camBasedSetting==True:
 
             sample_ui.toggleCamBasedSelOff_button.setHidden(True)
             sample_ui.toggleCamBasedSelOn_button.setHidden(False)
         else:
             sample_ui.toggleCamBasedSelOff_button.setHidden(False)
             sample_ui.toggleCamBasedSelOn_button.setHidden(True)
+            
+        symSetting= cmds.symmetricModelling(query=True,symmetry=False)
+        
+        if symSetting==0:
+
+            sample_ui.toggleReflectionSetModeOff_button.setHidden(False)
+            sample_ui.toggleReflectionSetModeOn_button.setHidden(True)
+        else:
+            sample_ui.toggleReflectionSetModeOff_button.setHidden(True)
+            sample_ui.toggleReflectionSetModeOn_button.setHidden(False)
+            
 
 
 
