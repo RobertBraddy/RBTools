@@ -1,9 +1,10 @@
 import sys
-
+from maya import OpenMayaUI
 from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from shiboken2 import getCppPointer
+from shiboken2 import wrapInstance
 import maya.api.OpenMaya as om
 import maya.OpenMayaUI as omui
 import maya.cmds as cmds
@@ -132,7 +133,7 @@ class ScrollableWidget(QtWidgets.QWidget):
         self.scroll_area.setLineWidth(0)
         self.scroll_area.setMidLineWidth(0)
         self.scroll_area.setFrameShadow(QtWidgets.QFrame.Plain)
-        
+
         #, frameShadow=Plain, line25=0 and midLine25=0
         #scrollAreaWidgetContents
         
@@ -140,27 +141,32 @@ class ScrollableWidget(QtWidgets.QWidget):
         self.contents = QtWidgets.QWidget(self.scroll_area)
         self.scroll_area.setWidget(self.contents)
 
+        
+        
+        
         # Add widgets to the contents widget
         self.vbox = QtWidgets.QVBoxLayout(self.contents)
-
+        self.vbox.setSpacing(3)
         # Add a button to the contents widget
 
 
         # Set the layout of the main widget
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.addWidget(self.scroll_area)
+        #main_layout.setSpacing(0)
         
     def add_widget(self, widget):
         self.vbox.addWidget(widget)
                 
         widget.setContentsMargins(0, 0, 0, 0)
+
         #widget.setLayout(sub_layout)
         #scrollarea.setWidget(widget)
         
     def add_layout(self, layout):
         self.vbox.addLayout(layout)
         layout.setContentsMargins(0, 0, 0, 0)
-        
+        layout.setSpacing(2)
 
 
 class CollapsibleHeader(QtWidgets.QWidget):
@@ -336,7 +342,7 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_extrude()
         self.widgets_edgeFlow()
         self.widgets_symmetrize()
-        self.widgets_average()
+        self.widgets_averageVert()
         self.widgets_chamfer()
         self.widgets_reorder()
         self.widgets_delEdge()
@@ -385,6 +391,25 @@ class SampleUI(QtWidgets.QWidget):
         self.widgets_zeroPivot()
         self.widgets_freezeTransform()
         self.widgets_resetTransform()
+        self.widgets_duplicate()
+        self.widgets_instance()
+        self.widgets_replace()
+        self.widgets_average()
+        self.widgets_unlockNormals()
+        self.widgets_reverse()
+        self.widgets_lockNormals()
+        self.widgets_setToFace()
+        self.widgets_average()
+        self.widgets_toggleReflectionSetModeOff()
+        self.widgets_toggleReflectionSetModeOn()
+        self.widgets_toggleCamBasedSelOff()
+        self.widgets_toggleCamBasedSelOn()
+        self.widgets_marquee()
+        self.widgets_drag()
+        self.widgets_preserveUVs()
+        self.widgets_preserveChildren()
+        self.widgets_tweakMode()
+        self.widgets_edgeConstraint()
         self.create_layout()
         self.create_connections()
         self.create_workspace_control()
@@ -475,8 +500,9 @@ class SampleUI(QtWidgets.QWidget):
         freezeTransform_popup.exec_(self.freezeTransform_button.mapToGlobal(position))
 
     def widgets_freezeTransform(self):
-        self.freezeTransform_button = QtWidgets.QPushButton("Freeze Transforms")
-        self.freezeTransform_button.setIcon(QtGui.QIcon(":polyfreezeTransformFacet.png"))
+        
+        self.freezeTransform_button = QtWidgets.QPushButton("Freeze Transform")
+        self.freezeTransform_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
         self.freezeTransform_button.setIconSize(QtCore.QSize(25, 20))
         self.freezeTransform_button.clicked.connect(self.perform_freezeTransform)
         self.freezeTransform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -496,18 +522,60 @@ class SampleUI(QtWidgets.QWidget):
         resetTransform_popup.exec_(self.resetTransform_button.mapToGlobal(position))
 
     def widgets_resetTransform(self):
-        self.resetTransform_button = QtWidgets.QPushButton("Reset Transforms")
+        self.resetTransform_button = QtWidgets.QPushButton("Reset Transform")
         self.resetTransform_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
         self.resetTransform_button.setIconSize(QtCore.QSize(25, 20))
         self.resetTransform_button.clicked.connect(self.perform_resetTransform)
         self.resetTransform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.resetTransform_button.customContextMenuRequested.connect(self.popup_resetTransform) 
 
+    def perform_duplicate(self):
+        mel.eval("duplicatePreset(1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1);")
+        
+    def widgets_duplicate(self):
+        self.duplicate_button = QtWidgets.QPushButton("Duplicate")
+        #self.resetTransform_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.duplicate_button.setIconSize(QtCore.QSize(25, 20))
+        self.duplicate_button.clicked.connect(self.perform_duplicate)
+        
+    def perform_instance(self):
+        mel.eval("duplicatePreset(1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1);")
+        
+    def widgets_instance(self):
+        self.instance_button = QtWidgets.QPushButton("Instance")
+        #self.resetTransform_button.setIcon(QtGui.QIcon(":menuIconModify.png"))
+        self.instance_button.setIconSize(QtCore.QSize(25, 20))
+        self.instance_button.clicked.connect(self.perform_instance)
+        
+    def perform_replace(self):
+        mel.eval("ReplaceObjects;")
+        
+    def open_replaceOptions(self):
+        self.replace_button.setHidden(True)
+        mel.eval("ReplaceObjectsOptions;")
+        self.replace_button.setHidden(False)
+        
+    def popup_replace(self, position):
+        replace_popup = QtWidgets.QMenu()
+        replace_action = QtWidgets.QAction('Settings', self)
+        replace_action.triggered.connect(self.open_replaceOptions)
+        replace_popup.addAction(replace_action)
+        replace_popup.exec_(self.replace_button.mapToGlobal(position))
+        
+    def widgets_replace(self):
+        self.replace_button = QtWidgets.QPushButton("Replace")
+        self.replace_button.setIconSize(QtCore.QSize(25, 25))
+        self.replace_button.clicked.connect(self.perform_replace)
+        self.replace_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.replace_button.customContextMenuRequested.connect(self.popup_replace)
+
     def create_sphere(self):
         mel.eval("CreatePolygonSphere;")
         
     def open_sphereOptions(self):
+        self.sphere_button.setHidden(True)
         mel.eval("CreatePolygonSphereOptions;")
+        self.sphere_button.setHidden(False)
         
     def popup_sphere(self, position):
         sphere_popup = QtWidgets.QMenu()
@@ -521,8 +589,12 @@ class SampleUI(QtWidgets.QWidget):
         self.sphere_button.setIcon(QtGui.QIcon(":polySphere.png"))
         self.sphere_button.setIconSize(QtCore.QSize(25, 25))
         self.sphere_button.clicked.connect(self.create_sphere)
+        #self.sphere_button.doubleClicked.connect(self.open_sphereOptions)
         self.sphere_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        
         self.sphere_button.customContextMenuRequested.connect(self.popup_sphere)
+
+        
                                 
     def create_cube(self):
         mel.eval("CreatePolygonCube;")
@@ -930,26 +1002,26 @@ class SampleUI(QtWidgets.QWidget):
         self.symmetrize_button.setIconSize(QtCore.QSize(25, 20))
         self.symmetrize_button.clicked.connect(self.perform_symmetrize)
         
-    def perform_average(self):
+    def perform_averageVert(self):
         mel.eval("AverageVertex;")
         
-    def open_averageOptions(self):
+    def open_averageVertOptions(self):
         mel.eval("AverageVertexOptions;")
         
-    def popup_average(self, position):
-        average_popup = QtWidgets.QMenu()
-        average_action = QtWidgets.QAction('Settings', self)
-        average_action.triggered.connect(self.open_averageOptions)
-        average_popup.addAction(average_action)
-        average_popup.exec_(self.average_button.mapToGlobal(position))
+    def popup_averageVert(self, position):
+        averageVert_popup = QtWidgets.QMenu()
+        averageVert_action = QtWidgets.QAction('Settings', self)
+        averageVert_action.triggered.connect(self.open_averageVertOptions)
+        averageVert_popup.addAction(averageVert_action)
+        averageVert_popup.exec_(self.averageVert_button.mapToGlobal(position))
 
-    def widgets_average(self):
-        self.average_button = QtWidgets.QPushButton("Average")
-        self.average_button.setIcon(QtGui.QIcon(":polyAverageVertex.png"))
-        self.average_button.setIconSize(QtCore.QSize(25, 20))
-        self.average_button.clicked.connect(self.perform_average)
-        self.average_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.average_button.customContextMenuRequested.connect(self.popup_average) 
+    def widgets_averageVert(self):
+        self.averageVert_button = QtWidgets.QPushButton("Average")
+        self.averageVert_button.setIcon(QtGui.QIcon(":polyAverageVertex.png"))
+        self.averageVert_button.setIconSize(QtCore.QSize(25, 20))
+        self.averageVert_button.clicked.connect(self.perform_averageVert)
+        self.averageVert_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.averageVert_button.customContextMenuRequested.connect(self.popup_averageVert) 
         
     def perform_chamfer(self):
         mel.eval("ChamferVertex;")
@@ -1614,27 +1686,6 @@ class SampleUI(QtWidgets.QWidget):
         self.separate_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.separate_button.customContextMenuRequested.connect(self.popup_separate) 
         
-    def perform_conform(self):
-        mel.eval("ConformPolygon;")
-        
-    def open_conformOptions(self):
-        mel.eval("ConformPolygonOptions;")
-        
-    def popup_conform(self, position):
-        conform_popup = QtWidgets.QMenu()
-        conform_action = QtWidgets.QAction('Settings', self)
-        conform_action.triggered.connect(self.open_conformOptions)
-        conform_popup.addAction(conform_action)
-        conform_popup.exec_(self.conform_button.mapToGlobal(position))
-
-    def widgets_conform(self):
-        self.conform_button = QtWidgets.QPushButton("conform")
-        self.conform_button.setIcon(QtGui.QIcon(":polyconformFacet.png"))
-        self.conform_button.setIconSize(QtCore.QSize(25, 20))
-        self.conform_button.clicked.connect(self.perform_conform)
-        self.conform_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.conform_button.customContextMenuRequested.connect(self.popup_conform) 
-        
     def perform_fillHole(self):
         mel.eval("FillHole")
         
@@ -1678,7 +1729,8 @@ class SampleUI(QtWidgets.QWidget):
         self.reduce_button.customContextMenuRequested.connect(self.popup_reduce) 
         
     def perform_remesh(self):
-        mel.eval("polyRemesh -maxEdgeLength 1 -useRelativeValues 1 -collapseThreshold 20 -smoothStrength 0 -tessellateBorders 1 -interpolationType 2;")
+        mel.eval("polyRemesh -maxEdgeLength 2 -useRelativeValues 0 -collapseThreshold 44.4015 -smoothStrength 0 -tessellateBorders 1 -interpolationType 2;")
+        mel.eval('polyAverageNormal -prenormalize 1 -allowZeroNormal 0 -postnormalize 0 -distance 0.1 -replaceNormalXYZ 1 0 0') 
         
     def open_remeshOptions(self):
         mel.eval("performPolyRemesh 1;")
@@ -1790,6 +1842,220 @@ class SampleUI(QtWidgets.QWidget):
         self.mirror_button.clicked.connect(self.perform_mirror)
         self.mirror_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.mirror_button.customContextMenuRequested.connect(self.popup_mirror) 
+        
+    def perform_average(self):
+        mel.eval("AveragePolygonNormals;")
+        
+    def open_averageOptions(self):
+        mel.eval("AveragePolygonNormalsOptions;")
+        
+    def popup_average(self, position):
+        average_popup = QtWidgets.QMenu()
+        average_action = QtWidgets.QAction('Settings', self)
+        average_action.triggered.connect(self.open_averageOptions)
+        average_popup.addAction(average_action)
+        average_popup.exec_(self.average_button.mapToGlobal(position))
+
+    def widgets_average(self):
+        self.average_button = QtWidgets.QPushButton("Average")
+        self.average_button.setIcon(QtGui.QIcon(":polyNormalAverage.png"))
+        self.average_button.setIconSize(QtCore.QSize(25, 20))
+        self.average_button.clicked.connect(self.perform_average)
+        self.average_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.average_button.customContextMenuRequested.connect(self.popup_average) 
+        
+    def perform_setToFace(self):
+        mel.eval("polySetToFaceNormal ;")
+        
+    def open_setToFaceOptions(self):
+        mel.eval("polySetToFaceNormal Options;")
+        
+    def popup_setToFace(self, position):
+        setToFace_popup = QtWidgets.QMenu()
+        setToFace_action = QtWidgets.QAction('Settings', self)
+        setToFace_action.triggered.connect(self.open_setToFaceOptions)
+        setToFace_popup.addAction(setToFace_action)
+        setToFace_popup.exec_(self.setToFace_button.mapToGlobal(position))
+
+    def widgets_setToFace(self):
+        self.setToFace_button = QtWidgets.QPushButton("setToFace")
+        self.setToFace_button.setIcon(QtGui.QIcon(":polyNormalSetToFace.png"))
+        self.setToFace_button.setIconSize(QtCore.QSize(25, 20))
+        self.setToFace_button.clicked.connect(self.perform_setToFace)
+        self.setToFace_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setToFace_button.customContextMenuRequested.connect(self.popup_setToFace) 
+        
+    def perform_reverse(self):
+        mel.eval("ReversePolygonNormals;")
+        
+    def open_reverseOptions(self):
+        mel.eval("ReversePolygonNormalsOptions;")
+        
+    def popup_reverse(self, position):
+        reverse_popup = QtWidgets.QMenu()
+        reverse_action = QtWidgets.QAction('Settings', self)
+        reverse_action.triggered.connect(self.open_reverseOptions)
+        reverse_popup.addAction(reverse_action)
+        reverse_popup.exec_(self.reverse_button.mapToGlobal(position))
+
+    def widgets_reverse(self):
+        self.reverse_button = QtWidgets.QPushButton("Reverse")
+        self.reverse_button.setIcon(QtGui.QIcon(":polyNormal.png"))
+        self.reverse_button.setIconSize(QtCore.QSize(25, 20))
+        self.reverse_button.clicked.connect(self.perform_reverse)
+        self.reverse_button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.reverse_button.customContextMenuRequested.connect(self.popup_reverse) 
+        
+    def perform_conform(self):
+        mel.eval("ConformPolygonNormals;")
+        
+    def widgets_conform(self):
+        self.conform_button = QtWidgets.QPushButton("Conform")
+        self.conform_button.setIcon(QtGui.QIcon(":polyNormalsConform.png"))
+        self.conform_button.setIconSize(QtCore.QSize(25, 20))
+        self.conform_button.clicked.connect(self.perform_conform)
+
+        
+    def perform_lockNormals(self):
+        mel.eval("LockNormals;")
+        
+    def widgets_lockNormals(self):
+        self.lockNormals_button = QtWidgets.QPushButton("Lock Normals")
+        self.lockNormals_button.setIcon(QtGui.QIcon(":polyNormalLock.png"))
+        self.lockNormals_button.setIconSize(QtCore.QSize(25, 20))
+        self.lockNormals_button.clicked.connect(self.perform_lockNormals)
+        
+    def perform_unlockNormals(self):
+        mel.eval("UnlockNormals;")
+        
+    def widgets_unlockNormals(self):
+        self.unlockNormals_button = QtWidgets.QPushButton("Unlock Normals")
+        self.unlockNormals_button.setIcon(QtGui.QIcon(":polyNormalUnlock.png"))
+        self.unlockNormals_button.setIconSize(QtCore.QSize(25, 20))
+        self.unlockNormals_button.clicked.connect(self.perform_unlockNormals)
+        
+    def perform_unlockNormals(self):
+        mel.eval("UnlockNormals;")
+        
+    def widgets_unlockNormals(self):
+        self.unlockNormals_button = QtWidgets.QPushButton("Unlock Normals")
+        self.unlockNormals_button.setIcon(QtGui.QIcon(":polyNormalUnlock.png"))
+        self.unlockNormals_button.setIconSize(QtCore.QSize(25, 20))
+        self.unlockNormals_button.clicked.connect(self.perform_unlockNormals)
+    
+
+    
+    def perform_toggleReflectionSetMode(self):
+        print "this"
+        currentMode = cmds.symmetricModelling(query=True,symmetry=False)
+        print currentMode
+        newMode = "none" 
+        if currentMode == 0:
+            self.toggleReflectionSetModeOn_button.setHidden(False)
+            self.toggleReflectionSetModeOff_button.setHidden(True)
+            cmds.symmetricModelling(symmetry=True)
+            cmds.symmetricModelling(about='world')
+            cmds.symmetricModelling(axis='x')
+        else:
+            self.toggleReflectionSetModeOn_button.setHidden(True)
+            self.toggleReflectionSetModeOff_button.setHidden(False)
+            cmds.symmetricModelling(symmetry=False)
+            
+    def widgets_toggleReflectionSetModeOff(self):
+        self.toggleReflectionSetModeOff_button = QtWidgets.QPushButton("Symmetry")
+        self.toggleReflectionSetModeOff_button.setIconSize(QtCore.QSize(40, 30))
+        self.toggleReflectionSetModeOff_button.clicked.connect(self.perform_toggleReflectionSetMode)
+        
+    def widgets_toggleReflectionSetModeOn(self):
+        self.toggleReflectionSetModeOn_button = QtWidgets.QPushButton("Symmetry")
+        self.toggleReflectionSetModeOn_button.setHidden(True)
+        self.toggleReflectionSetModeOn_button.setStyleSheet("background-color: darkblue;")
+        self.toggleReflectionSetModeOn_button.setIconSize(QtCore.QSize(40, 30))
+        self.toggleReflectionSetModeOn_button.clicked.connect(self.perform_toggleReflectionSetMode)
+        
+    def set_camBasedSel(self):
+
+        currentMode=cmds.selectPref(query=True,useDepth=True)
+
+        if currentMode == False:
+            self.toggleCamBasedSelOff_button.setHidden(True)
+            self.toggleCamBasedSelOn_button.setHidden(False)
+            cmds.selectPref(useDepth=True)
+        else:
+            self.toggleCamBasedSelOff_button.setHidden(False)
+            self.toggleCamBasedSelOn_button.setHidden(True)
+            cmds.selectPref(useDepth=False)
+            
+    def widgets_toggleCamBasedSelOff(self):
+        self.toggleCamBasedSelOff_button = QtWidgets.QPushButton("Cam Base Selection Off")
+        self.toggleCamBasedSelOff_button.setIconSize(QtCore.QSize(40, 30))
+        self.toggleCamBasedSelOff_button.clicked.connect(self.set_camBasedSel)
+        
+    def widgets_toggleCamBasedSelOn(self):
+        self.toggleCamBasedSelOn_button = QtWidgets.QPushButton("Cam Base Selection On")
+        self.toggleCamBasedSelOn_button.setStyleSheet("background-color: darkblue;")
+        self.toggleCamBasedSelOn_button.setHidden(True)
+        self.toggleCamBasedSelOn_button.setIconSize(QtCore.QSize(40, 30))
+        self.toggleCamBasedSelOn_button.clicked.connect(self.set_camBasedSel)
+        
+                
+    def set_marquee(self):
+        cmds.selectPref(paintSelect=False)
+
+    def widgets_marquee(self):
+        self.marquee_button = QtWidgets.QPushButton("Marquee")
+        self.marquee_button.setIconSize(QtCore.QSize(40, 30))
+        self.marquee_button.clicked.connect(self.set_marquee)
+        
+    def set_drag(self):
+        cmds.selectPref(paintSelect=True)
+
+    def widgets_drag(self):
+        self.drag_button = QtWidgets.QPushButton("Drag")
+        self.drag_button.setIconSize(QtCore.QSize(40, 30))
+        self.drag_button.clicked.connect(self.set_drag)
+        
+    def set_preserveUVs(self):
+        mel.eval("setTRSPreserveUVs(!`optionVar -q trsManipsPreserveUvs`)")
+
+    def widgets_preserveUVs(self):
+        self.preserveUVs_button = QtWidgets.QPushButton("Preserve UVs")
+        self.preserveUVs_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveUVs_button.clicked.connect(self.set_preserveUVs)
+        
+    def set_preserveChildren(self):
+        mel.eval("setTRSPreserveChildPosition(!`optionVar -q TRSPreserveChildPosition`)")
+
+    def widgets_preserveChildren(self):
+        self.preserveChildren_button = QtWidgets.QPushButton("Preserve Children")
+        self.preserveChildren_button.setIconSize(QtCore.QSize(40, 30))
+        self.preserveChildren_button.clicked.connect(self.set_preserveChildren)
+        
+    def set_tweakMode(self):
+        mel.eval("setTRSPreserveChildPosition(!`optionVar -q TRSPreserveChildPosition`)")
+
+    def widgets_tweakMode(self):
+        self.tweakMode_button = QtWidgets.QPushButton("Tweak")
+        self.tweakMode_button.setIconSize(QtCore.QSize(40, 30))
+        self.tweakMode_button.clicked.connect(self.set_tweakMode)
+        
+        
+    def set_edgeConstraint(self):    
+        if not constraint_state:
+            constraint_state = 0
+        global constraint_state
+        if constraint_state == 0:
+            cmds.dR_slideEdge()
+            constraint_state = 1
+        else:
+            cmds.dR_slideOff()
+            constraint_state = 0
+            
+    def widgets_edgeConstraint(self):
+        self.edgeConstraint_button = QtWidgets.QPushButton("Edge Constraint")
+        self.edgeConstraint_button.setIconSize(QtCore.QSize(40, 30))
+        self.edgeConstraint_button.clicked.connect(self.set_edgeConstraint)
+            
 
     def widgets_sculpting(self):    
         self.lift_button = QtWidgets.QPushButton("")
@@ -1874,10 +2140,14 @@ class SampleUI(QtWidgets.QWidget):
 
     def widgets_collapsables(self): 
         
+        self.view_tools = CollapsibleWidget("Views")
+        self.view_tools.set_expanded(True)
         self.history_tools = CollapsibleWidget("Delete History")
         self.history_tools.set_expanded(True)
         self.modify_tools = CollapsibleWidget("Modify")
         self.modify_tools.set_expanded(False)
+        self.duplicate_tools = CollapsibleWidget("Duplicate")
+        self.duplicate_tools.set_expanded(False)
         
         self.polygon_primatives = CollapsibleWidget("Polygon Primatives")
         self.polygon_primatives.set_expanded(True)
@@ -1892,10 +2162,25 @@ class SampleUI(QtWidgets.QWidget):
         self.secSculpting_menu = CollapsibleWidget("")
         self.secSculpting_menu.set_expanded(False)
         self.secSculpting_menu.set_Margins(4,0,0,0)
-        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0))       
+        self.secSculpting_menu.set_header_background_color(QtGui.QColor(125,125, 125,0)) 
         
-        self.mesh_menu = CollapsibleWidget("Mesh")
-        self.mesh_menu.set_expanded(True)
+        self.boolean_menu = CollapsibleWidget("Boolean")
+        self.boolean_menu.set_expanded(False)  
+        
+        self.display_menu = CollapsibleWidget("Display")
+        self.display_menu.set_expanded(False)          
+        
+        self.combine_menu = CollapsibleWidget("Combine")
+        self.combine_menu.set_expanded(True)
+        
+        self.remesh_menu = CollapsibleWidget("Remesh")
+        self.remesh_menu .set_expanded(True)
+        
+        self.edgeTools_menu = CollapsibleWidget("Edge Tools")
+        self.edgeTools_menu .set_expanded(True)
+        
+        self.symmetry_menu = CollapsibleWidget("Symmetry")
+        self.edgeTools_menu .set_expanded(True)
         
         # Edit Mesh Tools          
         self.editMesh_menu = CollapsibleWidget("Edit Mesh Tools  ")
@@ -1917,14 +2202,40 @@ class SampleUI(QtWidgets.QWidget):
         history_layout1.addWidget(self.deleteNonDefHistory_button)
         
         modify_layout0 = QtWidgets.QHBoxLayout()
-        modify_layout0.addWidget(self.freezeTransform_button)
-        modify_layout0.addWidget(self.resetTransform_button)
+        modify_layout0.addWidget(self.centerPivot_button)
+        modify_layout0.addWidget(self.zeroPivot_button)
+
         
         modify_layout1 = QtWidgets.QHBoxLayout()
-        modify_layout1.addWidget(self.centerPivot_button)
         modify_layout1.addWidget(self.bakePivot_button)
-        modify_layout1.addWidget(self.zeroPivot_button)
+        modify_layout1.addWidget(self.freezeTransform_button)
+        modify_layout1.addWidget(self.resetTransform_button)
+
+        duplicate_layout1 = QtWidgets.QHBoxLayout()
+        duplicate_layout1.addWidget(self.duplicate_button)
+        duplicate_layout1.addWidget(self.instance_button)
+        duplicate_layout1.addWidget(self.replace_button)
         
+        selection_layout1 = QtWidgets.QHBoxLayout()
+        selection_layout1.addWidget(self.toggleReflectionSetModeOff_button)
+        selection_layout1.addWidget(self.toggleReflectionSetModeOn_button)
+        selection_layout1.addWidget(self.toggleCamBasedSelOff_button)
+        selection_layout1.addWidget(self.toggleCamBasedSelOn_button)
+        
+        selection_layout2 = QtWidgets.QHBoxLayout()
+        selection_layout2.addWidget(self.marquee_button)
+        selection_layout2.addWidget(self.drag_button)
+        selection_layout2.addWidget(self.tweakMode_button)
+        
+        selection_layout3 = QtWidgets.QHBoxLayout()
+        selection_layout3.addWidget(self.preserveUVs_button)
+        selection_layout3.addWidget(self.preserveChildren_button)
+        
+        selection_layout4 = QtWidgets.QHBoxLayout()
+        selection_layout4.addWidget(self.edgeConstraint_button)
+
+
+
         prim_layout1 = QtWidgets.QHBoxLayout()
         prim_layout1.addWidget(self.sphere_button)
         prim_layout1.addWidget(self.cube_button)
@@ -1939,15 +2250,17 @@ class SampleUI(QtWidgets.QWidget):
         prim_layout2.addWidget(self.pyramid_button)
         prim_layout2.addWidget(self.prism_button)
         prim_layout2.addWidget(self.pipe_button)
+        prim_layout2.addWidget(self.helix_button)
         
         prim_layout3 = QtWidgets.QHBoxLayout()
         #prim_layout3.addWidget(self.pipe_button)
-        prim_layout3.addWidget(self.helix_button)
+        #prim_layout3.addWidget(self.helix_button)
         prim_layout3.addWidget(self.gear_button)
         prim_layout3.addWidget(self.soccer_button)
         prim_layout3.addWidget(self.superEllipse_button)
         prim_layout3.addWidget(self.sphericalHarm_button)
         prim_layout3.addWidget(self.ultraShape_button)
+        prim_layout3.addWidget(self.sculptObjects_button)
         
         sculpt_layout1 = QtWidgets.QHBoxLayout()
         sculpt_layout1.addWidget(self.lift_button)
@@ -1956,7 +2269,7 @@ class SampleUI(QtWidgets.QWidget):
         sculpt_layout1.addWidget(self.sculptGrab_button)
         sculpt_layout1.addWidget(self.sculptPinch_button)
         sculpt_layout1.addWidget(self.sculptFlatten_button)
-        sculpt_layout1.addWidget(self.sculptObjects_button)
+        #sculpt_layout1.addWidget(self.sculptObjects_button)
         sculpt_layout1.setAlignment(QtCore.Qt.AlignTop)
 
         sculpt_layout2 = QtWidgets.QHBoxLayout()
@@ -1965,33 +2278,31 @@ class SampleUI(QtWidgets.QWidget):
         sculpt_layout2.addWidget(self.sculptSpray_button)
         sculpt_layout2.addWidget(self.sculptRepeat_button)
         sculpt_layout2.addWidget(self.sculptImprint_button)
+        sculpt_layout2.addWidget(self.sculptWax_button)
+        sculpt_layout2.addWidget(self.sculptScrape_button)
+        sculpt_layout2.addWidget(self.sculptFill_button)
+        
         sculpt_layout2.setAlignment(QtCore.Qt.AlignTop)
         
         sculpt_layout3 = QtWidgets.QHBoxLayout()
-        sculpt_layout3.addWidget(self.sculptWax_button)
-        sculpt_layout3.addWidget(self.sculptScrape_button)
-        sculpt_layout3.addWidget(self.sculptFill_button)
         sculpt_layout3.addWidget(self.sculptKnife_button)
         sculpt_layout3.addWidget(self.sculptSmear_button)
+        sculpt_layout3.addWidget(self.sculptBulge_button)
+        sculpt_layout3.addWidget(self.sculptAmplify_button)
+        sculpt_layout3.addWidget(self.sculptFreeze_button)
+        sculpt_layout3.addWidget(self.sculptFreezeSelect_button)
         sculpt_layout3.setAlignment(QtCore.Qt.AlignTop)
         
-        sculpt_layout4 = QtWidgets.QHBoxLayout()
-        sculpt_layout4.addWidget(self.sculptBulge_button)
-        sculpt_layout4.addWidget(self.sculptAmplify_button)
-        sculpt_layout4.addWidget(self.sculptFreeze_button)
-        sculpt_layout4.addWidget(self.sculptFreezeSelect_button)
-        sculpt_layout4.setAlignment(QtCore.Qt.AlignTop)
+        boolean_layout1 = QtWidgets.QHBoxLayout()
+        boolean_layout1.addWidget(self.union_button)
+        boolean_layout1.addWidget(self.difference_button)
+        boolean_layout1.addWidget(self.intersection_button)
+        boolean_layout1.setAlignment(QtCore.Qt.AlignTop)
 
-        mesh_layout1 = QtWidgets.QHBoxLayout()
-        mesh_layout1.addWidget(self.union_button)
-        mesh_layout1.addWidget(self.difference_button)
-        mesh_layout1.addWidget(self.intersection_button)
-        mesh_layout1.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout2 = QtWidgets.QHBoxLayout()
         mesh_layout2.addWidget(self.combine_button)
         mesh_layout2.addWidget(self.separate_button)
-        mesh_layout2.addWidget(self.conform_button)
         mesh_layout2.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout3 = QtWidgets.QHBoxLayout()
@@ -2004,13 +2315,15 @@ class SampleUI(QtWidgets.QWidget):
         mesh_layout4.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout5 = QtWidgets.QHBoxLayout()
-        mesh_layout5.addWidget(self.smooth_button)
+        mesh_layout5.addWidget(self.averageVert_button)
         mesh_layout5.addWidget(self.divide_button)
-        mesh_layout5.addWidget(self.triangulate_button)
-        mesh_layout5.addWidget(self.quadrangulate_button)
+        mesh_layout5.addWidget(self.smooth_button)
         mesh_layout5.setAlignment(QtCore.Qt.AlignTop)
         
         mesh_layout6 = QtWidgets.QHBoxLayout()
+        mesh_layout6.addWidget(self.conform_button)
+        mesh_layout6.addWidget(self.triangulate_button)
+        mesh_layout6.addWidget(self.quadrangulate_button)
         #mesh_layout6.addWidget(self.mirror_button)
 
         
@@ -2035,16 +2348,17 @@ class SampleUI(QtWidgets.QWidget):
         editMesh_layout3.addWidget(self.bevel_button)
         editMesh_layout3.addWidget(self.extrude_button)
         editMesh_layout3.setAlignment(QtCore.Qt.AlignTop)
-        
+
         editMesh_layout4 = QtWidgets.QHBoxLayout()
         editMesh_layout4.addWidget(self.merge_button)
-        editMesh_layout4.addWidget(self.mergeToCenter_button)
+        #editMesh_layout4.addWidget(self.mergeToCenter_button)
         editMesh_layout4.addWidget(self.targetWeld_button)
         #editMesh_layout4.addWidget(self.transform_button)
         editMesh_layout4.setAlignment(QtCore.Qt.AlignTop)
+        
     
         editMesh_layout5 = QtWidgets.QHBoxLayout()
-        editMesh_layout5.addWidget(self.flip_button)
+        #editMesh_layout5.addWidget(self.flip_button)
         editMesh_layout5.addWidget(self.symmetrize_button)
         editMesh_layout5.addWidget(self.mirror_button)
         editMesh_layout5.setAlignment(QtCore.Qt.AlignTop)
@@ -2052,12 +2366,13 @@ class SampleUI(QtWidgets.QWidget):
         editMesh_layout6 = QtWidgets.QHBoxLayout()
         editMesh_layout6.addWidget(self.detach_button)
         editMesh_layout6.addWidget(self.extract_button)
+        editMesh_layout6.addWidget(self.duplicateFacet_button)
         #editMesh_layout6.addWidget(self.reorder_button)
         editMesh_layout6.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout7 = QtWidgets.QHBoxLayout()
-        editMesh_layout7.addWidget(self.average_button)
-        editMesh_layout7.addWidget(self.delEdge_button)
+        editMesh_layout7.addWidget(self.crease_button)
+        #editMesh_layout7.addWidget(self.delEdge_button)
         editMesh_layout7.addWidget(self.edgeFlow_button)
         editMesh_layout7.setAlignment(QtCore.Qt.AlignTop)
         
@@ -2069,7 +2384,6 @@ class SampleUI(QtWidgets.QWidget):
         editMesh_layout8.setAlignment(QtCore.Qt.AlignTop)
         
         editMesh_layout9 = QtWidgets.QHBoxLayout()
-        editMesh_layout9.addWidget(self.duplicateFacet_button)
         editMesh_layout9.addWidget(self.chamfer_button)
         editMesh_layout9.addWidget(self.poke_button)
         editMesh_layout9.addWidget(self.wedge_button)
@@ -2085,14 +2399,16 @@ class SampleUI(QtWidgets.QWidget):
         meshTools_layout1 = QtWidgets.QHBoxLayout()
         #meshTools_layout1.addWidget(self.appendFacet_button)
         
+        
         meshTools_layout1.addWidget(self.slideEdge_button)
-        meshTools_layout1.addWidget(self.crease_button)
+        meshTools_layout1.addWidget(self.insertEdge_button)
+        #meshTools_layout1.addWidget(self.crease_button)
         meshTools_layout1.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout2 = QtWidgets.QHBoxLayout()
         #meshTools_layout2.addWidget(self.createPoly_button)
         #meshTools_layout2.addWidget(self.insertEdge_button)
-        meshTools_layout2.addWidget(self.insertEdge_button)
+        #meshTools_layout2.addWidget(self.insertEdge_button)
         meshTools_layout2.addWidget(self.offsetEdge_button)
         meshTools_layout2.addWidget(self.fillHole_button)
         meshTools_layout2.addWidget(self.makeHole_button)
@@ -2104,8 +2420,8 @@ class SampleUI(QtWidgets.QWidget):
         meshTools_layout3.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout4 = QtWidgets.QHBoxLayout()
-        meshTools_layout4.addWidget(self.quadDraw_button)
         meshTools_layout4.addWidget(self.multiCut_button)
+        meshTools_layout4.addWidget(self.quadDraw_button)
         meshTools_layout4.setAlignment(QtCore.Qt.AlignTop)
         
         meshTools_layout5 = QtWidgets.QHBoxLayout()
@@ -2118,57 +2434,151 @@ class SampleUI(QtWidgets.QWidget):
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
         #main_layout.se
+        
+        display_layout1= QtWidgets.QHBoxLayout()
+        display_layout1.addWidget(self.average_button)
+        display_layout1.addWidget(self.reverse_button)
+        display_layout1.addWidget(self.setToFace_button)
+        
+        
+        display_layout2= QtWidgets.QHBoxLayout()
+        display_layout2.addWidget(self.conform_button)
+        display_layout2.addWidget(self.lockNormals_button)
+        display_layout2.addWidget(self.unlockNormals_button)
+        
+        
+        line1 = QtWidgets.QFrame()
+        line1.setFrameShape(QtWidgets.QFrame.HLine)
+        line1.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line_layout1= QtWidgets.QHBoxLayout()
+        line_layout1.addWidget(line1)  
+        line2 = QtWidgets.QFrame()
+        line2.setFrameShape(QtWidgets.QFrame.HLine)
+        line2.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line_layout2 = QtWidgets.QHBoxLayout()
+        line_layout2.addWidget(line2)
+        line3 = QtWidgets.QFrame()
+        line3.setFrameShape(QtWidgets.QFrame.HLine)
+        line3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line3_layout = QtWidgets.QHBoxLayout()
+        line3_layout.addWidget(line3)
+        line4 = QtWidgets.QFrame()
+        line4.setFrameShape(QtWidgets.QFrame.HLine)
+        line4.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line4_layout = QtWidgets.QHBoxLayout()
+        line4_layout.addWidget(line4)
+        line5 = QtWidgets.QFrame()
+        line5.setFrameShape(QtWidgets.QFrame.HLine)
+        line5.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line5_layout = QtWidgets.QHBoxLayout()
+        line5_layout.addWidget(line5)
+        line6 = QtWidgets.QFrame()
+        line6.setFrameShape(QtWidgets.QFrame.HLine)
+        line6.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line6_layout = QtWidgets.QHBoxLayout()
+        line6_layout.addWidget(line6)
+        line7 = QtWidgets.QFrame()
+        line7.setFrameShape(QtWidgets.QFrame.HLine)
+        line7.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line7_layout = QtWidgets.QHBoxLayout()
+        line7_layout.addWidget(line7)
+        line8 = QtWidgets.QFrame()
+        line8.setFrameShape(QtWidgets.QFrame.HLine)
+        line8.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line8_layout = QtWidgets.QHBoxLayout()
+        line8_layout.addWidget(line8)
+        line9 = QtWidgets.QFrame()
+        line9.setFrameShape(QtWidgets.QFrame.HLine)
+        line9.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line9_layout = QtWidgets.QHBoxLayout()
+        line9_layout.addWidget(line9)
+        line10 = QtWidgets.QFrame()
+        line10.setFrameShape(QtWidgets.QFrame.HLine)
+        line10.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line10_layout = QtWidgets.QHBoxLayout()
+        line10_layout.addWidget(line10)
+        line11 = QtWidgets.QFrame()
+        line11.setFrameShape(QtWidgets.QFrame.HLine)
+        line11.setFrameShadow(QtWidgets.QFrame.Sunken)
+        line11_layout = QtWidgets.QHBoxLayout()
+        line11_layout.addWidget(line11)
+
+
 
         scrollable_widget = ScrollableWidget()
         main_layout.addWidget(scrollable_widget)
+        scrollable_widget.add_layout(history_layout1) 
+        scrollable_widget.add_layout(line_layout1 )
+        scrollable_widget.add_layout(modify_layout0)
+        scrollable_widget.add_layout(modify_layout1)
+        scrollable_widget.add_layout(line_layout2 )  
 
-        scrollable_widget.add_widget(self.history_tools)
-        self.history_tools.add_layout(history_layout1)     
-        scrollable_widget.add_widget(self.modify_tools)
-        self.modify_tools.add_layout(modify_layout0)
-        self.modify_tools.add_layout(modify_layout1)
-        scrollable_widget.add_widget(self.polygon_primatives)
-        self.polygon_primatives.add_layout(prim_layout1)
-        self.polygon_primatives.add_widget(self.polygon_primativesSec)
-        self.polygon_primativesSec.add_layout(prim_layout2)
-        self.polygon_primativesSec.add_layout(prim_layout3)
+        #scrollable_widget.add_widget(self.history_tools)
+        #self.history_tools.add_layout(history_layout1)     
+        #scrollable_widget.add_widget(self.modify_tools)
+        #self.modify_tools.add_layout(modify_layout0)
+        #self.modify_tools.add_layout(modify_layout1)
+        #scrollable_widget.add_widget(self.duplicate_tools)
+        scrollable_widget.add_layout(selection_layout2 )
+        scrollable_widget.add_layout(selection_layout1 )
+        scrollable_widget.add_layout(selection_layout3 )
+        scrollable_widget.add_layout(selection_layout4 )
+        scrollable_widget.add_layout(duplicate_layout1)
+
+        scrollable_widget.add_layout(line3_layout )  
+        #scrollable_widget.add_widget(self.polygon_primatives)
+        scrollable_widget.add_layout(prim_layout1)
+        scrollable_widget.add_layout(prim_layout2)
+        scrollable_widget.add_layout(prim_layout3)
+        scrollable_widget.add_layout(line4_layout )  
+    
         
+        #scrollable_widget.add_widget(self.sculpting_menu)
+        scrollable_widget.add_layout(sculpt_layout1)
+        scrollable_widget.add_layout(sculpt_layout2)
+        scrollable_widget.add_layout(sculpt_layout3)
+        scrollable_widget.add_layout(line5_layout ) 
+        #self.sculpting_menu.add_widget(self.secSculpting_menu)
         
-        scrollable_widget.add_widget(self.sculpting_menu)
-        self.sculpting_menu.add_layout(sculpt_layout1)
-        self.sculpting_menu.add_widget(self.secSculpting_menu)
-        self.secSculpting_menu.add_layout(sculpt_layout2)
-        self.secSculpting_menu.add_layout(sculpt_layout3)
-        self.secSculpting_menu.add_layout(sculpt_layout4)
-        scrollable_widget.add_widget(self.mesh_menu)
-        self.mesh_menu.add_layout(mesh_layout1)
-        self.mesh_menu.add_layout(mesh_layout2)
-        self.mesh_menu.add_layout(mesh_layout3)
-        self.mesh_menu.add_layout(mesh_layout4)
-        self.mesh_menu.add_layout(mesh_layout5)
-        self.mesh_menu.add_layout(mesh_layout6)
-        scrollable_widget.add_widget(self.editMesh_menu)
-        self.editMesh_menu.add_layout(meshTools_layout4)
-        self.editMesh_menu.add_layout(editMesh_layout1)
-        self.editMesh_menu.add_layout(editMesh_layout3)
-        self.editMesh_menu.add_layout(editMesh_layout4)
-        self.editMesh_menu.add_layout(editMesh_layout5)
-        self.editMesh_menu.add_layout(editMesh_layout6)
-        self.editMesh_menu.add_layout(editMesh_layout7)
-        self.editMesh_menu.add_layout(meshTools_layout1) 
+        #scrollable_widget.add_widget(self.remesh_menu)
+        scrollable_widget.add_layout(mesh_layout3)
+        scrollable_widget.add_layout(mesh_layout4)
+        scrollable_widget.add_layout(mesh_layout5)
+        scrollable_widget.add_layout(line6_layout ) 
+        #scrollable_widget.add_widget(self.combine_menu)
         
-        self.editMesh_menu.add_widget(self.editMesh_menuSec)
-        self.editMesh_menuSec.add_layout(editMesh_layout2)
-        self.editMesh_menuSec.add_layout(editMesh_layout8)
-        self.editMesh_menuSec.add_layout(editMesh_layout9)
-        self.editMesh_menuSec.add_layout(editMesh_layout10)
-        self.editMesh_menuSec.add_layout(meshTools_layout2)
-        scrollable_widget.add_widget(self.meshTools_menu)
-        self.meshTools_menu.add_layout(meshTools_layout1)   
-        self.meshTools_menu.add_layout(meshTools_layout3)    
+        scrollable_widget.add_layout(mesh_layout2)
+        scrollable_widget.add_layout(editMesh_layout6)
+        scrollable_widget.add_layout(line7_layout ) 
+        
+
+        #self.remesh_menu.add_layout(mesh_layout6)
+        #scrollable_widget.add_widget(self.editMesh_menu)
+        
+        scrollable_widget.add_layout(meshTools_layout4)
+        scrollable_widget.add_layout(editMesh_layout1)
+        scrollable_widget.add_layout(line8_layout ) 
+        scrollable_widget.add_layout(editMesh_layout3)
+        scrollable_widget.add_layout(editMesh_layout4)
+        scrollable_widget.add_layout(line9_layout ) 
+        scrollable_widget.add_layout(editMesh_layout5)
+        scrollable_widget.add_layout(editMesh_layout7)
+        #scrollable_widget.add_layout(meshTools_layout1) 
+        scrollable_widget.add_layout(line10_layout ) 
+        #self.editMesh_menu.add_widget(self.editMesh_menuSec)
+
+        #scrollable_widget.add_widget(self.meshTools_menu)
+  
         #self.meshTools_menu.add_layout(meshTools_layout4)  
         #self.meshTools_menu.add_layout(meshTools_layout5)  
-        
+        #scrollable_widget.add_widget(self.edgeTools_menu)
+        #scrollable_widget.add_widget(self.symmetry_menu)
+        #scrollable_widget.add_widget(self.boolean_menu)
+        scrollable_widget.add_layout(boolean_layout1)
+        scrollable_widget.add_layout(line11_layout ) 
+        #scrollable_widget.add_widget(self.display_menu)
+        scrollable_widget.add_layout(display_layout1)
+        scrollable_widget.add_layout(display_layout2)
         scroll_layout = QtWidgets.QVBoxLayout(self)
         scrollable_widget.add_layout(scroll_layout)
         scroll_layout.addStretch()
@@ -2236,18 +2646,14 @@ class SampleUI(QtWidgets.QWidget):
     def perform_separate(self):
         cmds.polySeparate()
         
-    def perform_conform(self):
-        cmds.ConformPolygon()
+
         
     def perform_fillHole(self):
         cmds.polyCloseBorder()
         
     def perform_reduce(self):
         cmds.polyReduce(ver=1,trm=0,shp=0, keepBorder=1, keepMapBorder=1,keepColorBorder=1,keepHardEdge=1, keepCreaseEdge=1, keepBorderWeight= 0.5,keepMapBorderWeight=0.5,keepColorBorderWeight=0.5,keepFaceGroupBorderWeight=0.5,keepHardEdgeWeight=0.5,keepCreaseEdgeWeight=0.5,useVirtualSymmetry=0,symmetryTolerance=0.01,sx=0,sy=1,sz=0,sw=0,preserveTopology=1,keepQuadsWeight=1,cachingReduce=1,ch=1,p=50,vct=0,tct=0,replaceOriginal=1)
-
-    def perform_remesh(self):
-        cmds.polyRemesh(maxEdgeLength=1,useRelativeValues=1,collapseThreshold=18,smoothStrength=0,tessellateBorders=1,interpolationType=2)
-        
+ 
     def perform_retopo(self):
         cmds.polyRetopo(constructionHistory=1,replaceOriginal=1, preserveHardEdges=1, topologyRegularity=0.5, faceUniformity=0,anisotropy=1,targetFaceCount=1000,targetFaceCountTolerance=10)
     
@@ -2289,12 +2695,29 @@ class SampleUI(QtWidgets.QWidget):
             self.workspace_control_instance.set_label("Floating Window")
         else:
             self.workspace_control_instance.set_label("Modeling Helper")
+            
+class UIEventFilter(QtCore.QObject):
+
+    def eventFilter(self, watched, event):
+
+        camBased= cmds.selectPref(q=True, useDepth=True)
+
+        if camBased==True:
+
+            sample_ui.toggleCamBasedSelOff_button.setHidden(True)
+            sample_ui.toggleCamBasedSelOn_button.setHidden(False)
+        else:
+            sample_ui.toggleCamBasedSelOff_button.setHidden(False)
+            sample_ui.toggleCamBasedSelOn_button.setHidden(True)
+
 
 
 
 if __name__ == "__main__":
 
     workspace_control_name = SampleUI.get_workspace_control_name()
+    win_ptr = OpenMayaUI.MQtUtil.mainWindow()
+    win = wrapInstance(long(win_ptr), QtWidgets.QMainWindow)
 
     if cmds.window(workspace_control_name, exists=True):
         cmds.deleteUI(workspace_control_name)  
@@ -2306,3 +2729,5 @@ if __name__ == "__main__":
 
  
     sample_ui = SampleUI()
+    filter2 = UIEventFilter()
+    win.installEventFilter(filter2)
